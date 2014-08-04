@@ -33,4 +33,10 @@ public final class Utils {
 		}
 		return str.toString();
 	}
+	
+	public static String byteToBinaryString(byte b) {
+		String str = Integer.toBinaryString((b & 0xFF));
+		str = String.format("%8s", str).replaceAll(" ", "0");
+		return str;
+	}
 }
