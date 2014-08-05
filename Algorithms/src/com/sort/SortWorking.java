@@ -84,8 +84,9 @@ public class SortWorking {
 		System.out.printf("Search for %s. Result: %s\n", val, res);
 	}
 	
-	static <T> T[] sort(T[] mas, Comparator<? super T> cmp) {
+	static List<Sorting>  getSorts() {
 		
+		//heap sort
 		Sorting heapSort = new Sorting() {
 			@Override
 			public <K> void sort(K[] mas, Comparator<? super K> cmp) {
@@ -97,8 +98,27 @@ public class SortWorking {
 			}
 		};
 		
-		List<Sorting> sorts = Arrays.asList(selectionSort, insertionSort, bubbleSort, heapSort);
-		 
+		//heap sort working
+		Sorting heapSortWorking = new Sorting() {
+			@Override
+			public <K> void sort(K[] mas, Comparator<? super K> cmp) {
+				HeapSortWorking.sort(mas, cmp);
+			}
+			@Override
+			public String toString() {
+				return HeapSortWorking.class.getSimpleName();
+			}
+		};
+		
+		List<Sorting> sorts = Arrays.asList(selectionSort, insertionSort, bubbleSort, 
+			heapSort, heapSortWorking);
+		
+		return sorts;
+	}
+	
+	static <T> T[] sort(T[] mas, Comparator<? super T> cmp) {
+		
+		List<Sorting> sorts = getSorts();				 
 		T[] result = null;
 		
 		for (int i = 0; i < sorts.size(); i ++) {			
