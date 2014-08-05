@@ -1,16 +1,20 @@
 package com.sort;
 
+import java.util.Arrays;
 import java.util.Comparator;
 
-public class MergeSort implements Sorting {
+public class MergeSort  {
 
-	@Override
-	public <T> void sort(T[] mas, Comparator<? super T> cmp) {
+	public static <T> void sortTopDown(T[] mas, Comparator<? super T> cmp) {
 		sort(mas, 0, mas.length, cmp);		
 	}
 	
+	public static <T> void sortBottomUp(T[] mas, Comparator<? super T> cmp) {
+		//TODO
+	}
+	
 	//[start, end)
-	private <T> void sort(T[] mas, int start, int end, Comparator<? super T> cmp) {
+	private static <T> void sort(T[] mas, int start, int end, Comparator<? super T> cmp) {
 		if (end - start > 1) {
 			int mid = (start + end) >> 1;
 			
@@ -25,7 +29,7 @@ public class MergeSort implements Sorting {
 	 * mas1 - [start, mid)
 	 * mas2 - [mid, end)
 	 */
-	private <T> void merge(T[] mas, int start, int mid, int end, Comparator<? super T> cmp) {		
+	private static <T> void merge(T[] mas, int start, int mid, int end, Comparator<? super T> cmp) {		
 		int totalSize = end - start;
 		@SuppressWarnings("unchecked")
 		T[] tmp = (T[]) new Object[totalSize];
@@ -44,5 +48,18 @@ public class MergeSort implements Sorting {
 		//copy tmp to mas
 		System.arraycopy(tmp, 0, mas, start, totalSize);
 	}
+		
 
+	public static void main(String[] args) {
+		String str = "mergesort";
+				
+		Character[] mas = new Character[str.length()];
+		for (int i = 0; i < str.length(); i ++) {
+			mas[i] = str.charAt(i);
+		}		
+		
+		Comparator<Character> cmp = Character::compareTo;		
+		sortTopDown(mas, cmp);
+		System.out.println(Arrays.toString(mas));
+	}
 }

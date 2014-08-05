@@ -75,8 +75,7 @@ public class SortRunner {
 		//cmp = cmp.reversed();
 		
 		mas = sort(mas, cmp);
-		
-		//TODO
+				
 		int val = 120;
 		int res = binarySearch(mas, val, cmp);
 		System.out.printf("Search for %s. Result: %s\n", val, res);
@@ -108,12 +107,31 @@ public class SortRunner {
 			}
 		};
 		
-		Sorting mergeSort = new MergeSort();
+		//merge sort
+		Sorting mergeSortTopDown = new Sorting() {
+			public <K> void sort(K[] mas, Comparator<? super K> cmp) {
+				MergeSort.sortTopDown(mas, cmp);
+			}
+			@Override
+			public String toString() {
+				return "MergeSort#TopDown";
+			}
+		};
+		
+		Sorting mergeSortBottomUp = new Sorting() {
+			public <K> void sort(K[] mas, Comparator<? super K> cmp) {
+				MergeSort.sortBottomUp(mas, cmp);
+			}
+			@Override
+			public String toString() {
+				return "MergeSort#BottomUp";
+			}
+		};
 		
 		List<Sorting> sorts = Arrays.asList(
 			selectionSort, insertionSort, bubbleSort, 
 			heapSort, heapSortWorking,
-			mergeSort
+			mergeSortTopDown, mergeSortBottomUp
 		);
 		
 		return sorts;
