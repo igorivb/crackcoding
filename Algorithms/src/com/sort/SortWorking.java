@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.Utils;
 
-public class CommonSort {
+public class SortWorking {
 
 	interface Sorting {
 		<T> void sort(T[] mas, Comparator<? super T> cmp);
@@ -31,7 +31,7 @@ public class CommonSort {
 		public <T> void sort(T[] mas, Comparator<? super T> cmp) {
 			for (int i = 1; i < mas.length; i ++) {
 				for (int j = i - 1; j >= 0 && cmp.compare(mas[j], mas[j + 1]) > 0; j --) {
-					Utils.swap(mas, j, j + 1);
+					Utils.swap(mas, j, j + 1);						
 				}
 			}
 		}
@@ -39,7 +39,7 @@ public class CommonSort {
 	
 	static class BubbleSort implements Sorting {
 		public <T> void sort(T[] mas, Comparator<? super T> cmp) {
-			for (int i = mas.length - 1; i > 0; i--) {
+			for (int i = mas.length - 1; i > 0; i --) {
 				for (int j = 0; j < i; j ++) {
 					if (cmp.compare(mas[j], mas[j + 1]) > 0) {
 						Utils.swap(mas, j, j + 1);
@@ -60,14 +60,15 @@ public class CommonSort {
 			int i = (start + end) >>> 1;
 			int c = cmp.compare(val, mas[i]);
 			if (c < 0) {
-				end = i -1;
-			} else if (c > 0) {
+				end = i - 1;
+			}  else if (c > 0) {
 				start = i + 1;
 			} else {
 				//found
 				return i;
-			}			
+			}
 		}
+		//not found
 		return -1;
 	}
 	

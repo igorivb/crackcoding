@@ -4,19 +4,19 @@ import com.Utils;
 
 public class Task5_8 {
 
-	/*
-	 * Note: Incorrect
-	 */
-	public static void drawLineFalse(byte[] screen, int width, int x1, int x2, int y) {
-		//find start and end bytes
-		int start = y * width + x1;
-		int end = y * width + x2;
-		
-		//set bytes from [start, end] to 1s
-		for (int i = start; i <= end; i ++) {
-			screen[i] = ~0;
-		}
-	}
+//	/*
+//	 * Note: Incorrect
+//	 */
+//	public static void drawLineFalse(byte[] screen, int width, int x1, int x2, int y) {
+//		//find start and end bytes
+//		int start = y * width + x1;
+//		int end = y * width + x2;
+//		
+//		//set bytes from [start, end] to 1s
+//		for (int i = start; i <= end; i ++) {
+//			screen[i] = ~0;
+//		}
+//	}
 	
 	public static void drawLine(byte[] screen, int width, int x1, int x2, int y) {
 		//PRE:
