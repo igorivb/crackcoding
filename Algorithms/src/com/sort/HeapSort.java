@@ -75,8 +75,8 @@ public class HeapSort {
 			heap.heapify(i, last);
 		}
 		
-		System.out.println("Created heap:");
-		heap.print();
+		//System.out.println("Created heap:");
+		//heap.print();
 		
 		//extract min
 		while (last > 0) {
@@ -85,8 +85,8 @@ public class HeapSort {
 			heap.heapify(0, last);
 		}
 		
-		System.out.println("Extracted min:");
-		heap.print();
+		//System.out.println("Extracted min:");
+		//heap.print();
 	}
 	
 	public static void main(String[] args) {

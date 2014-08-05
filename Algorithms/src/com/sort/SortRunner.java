@@ -6,11 +6,7 @@ import java.util.List;
 
 import com.Utils;
 
-public class SortWorking {
-
-	interface Sorting {
-		<T> void sort(T[] mas, Comparator<? super T> cmp);
-	}
+public class SortRunner {
 		
 	static class SelectionSort implements Sorting {
 		
@@ -75,10 +71,12 @@ public class SortWorking {
 	public static void main(String[] args) {		
 		
 		Integer[] mas = {1, 34, 67, 3, -5, 67, 45, 0, 120, 4};
-		Comparator<Integer> cmp = Integer::compare;
+		Comparator<Integer> cmp = (Integer::compare);
+		//cmp = cmp.reversed();
 		
 		mas = sort(mas, cmp);
 		
+		//TODO
 		int val = 120;
 		int res = binarySearch(mas, val, cmp);
 		System.out.printf("Search for %s. Result: %s\n", val, res);
@@ -110,8 +108,13 @@ public class SortWorking {
 			}
 		};
 		
-		List<Sorting> sorts = Arrays.asList(selectionSort, insertionSort, bubbleSort, 
-			heapSort, heapSortWorking);
+		Sorting mergeSort = new MergeSort();
+		
+		List<Sorting> sorts = Arrays.asList(
+			selectionSort, insertionSort, bubbleSort, 
+			heapSort, heapSortWorking,
+			mergeSort
+		);
 		
 		return sorts;
 	}
