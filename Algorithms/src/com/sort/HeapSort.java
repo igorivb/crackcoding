@@ -1,5 +1,6 @@
 package com.sort;
 
+import java.util.Arrays;
 import java.util.Comparator;
 
 import com.Utils;
@@ -14,34 +15,7 @@ public class HeapSort {
 		public Heap(T[] mas, Comparator<? super T> cmp) {
 			this.mas = mas;		
 			this.cmp = cmp;
-		}
-		
-		public int getParent(int i) {			
-			return i == 0 ? -1 : (i - 1) / 2;
-		}
-		
-		public int getLeftChild(int i) {
-			return i * 2 + 1;
-		}
-		
-		public void bubbleUp(int i) {			
-			while (i > 0) {
-				int parentIndex = this.getParent(i);
-				//check violation
-				if (cmp.compare(this.mas[parentIndex], this.mas[i]) > 0) {
-					Utils.swap(this.mas, parentIndex, i);
-					i = parentIndex;
-				} else {
-					break;
-				}							
-			}		
-		}
-		
-		public void bubbleDown() {
-			for (int i = 0; i < mas.length; i ++) {
-				
-			}
-		}
+		}		
 		
 		public void print() {
 			StringBuilder str = new StringBuilder();
@@ -59,30 +33,65 @@ public class HeapSort {
 			}
 			System.out.println(str);
 		}
+		
+		public void heapify(int i, int last) {
+			for (;;) {
+				int left = getLeft(i);
+				int right = getRight(i);
+				
+				int max = -1;
+				if (left <= last) {
+					max = left;
+					
+					if (right <= last && cmp.compare(this.mas[left], this.mas[right]) < 0) {
+						max = right;
+					}
+				}									
+								
+				if (max != -1 && cmp.compare(this.mas[i], this.mas[max]) < 0) {
+					Utils.swap(mas, i, max);
+					i = max;
+				} else {
+					break;
+				} 				
+			}			
+		}
+		
+		public int getLeft(int i) {
+			return 2 * i + 1;
+		}
+		
+		public int getRight(int i) {
+			return this.getLeft(i) + 1;
+		}
 	}
 	
 	public static <T> void heapSort(T[] mas, Comparator<? super T> cmp) {
 		
-		//init
-		Heap<T> heap = new Heap<>(mas, cmp);	
-		for (int i = 0; i < mas.length; i ++) {			
-			heap.bubbleUp(i);
+		//create heap
+		Heap<T> heap = new Heap<>(mas, cmp);
+		int last = heap.mas.length - 1;
+		for (int i = last >> 1; i >= 0; i --) {
+			heap.heapify(i, last);
 		}
 		
+		System.out.println("Created heap:");
 		heap.print();
 		
-		heap.bubbleDown();
+		//extract min
+		while (last > 0) {
+			Utils.swap(heap.mas, 0, last);
+			last --;
+			heap.heapify(0, last);
+		}
+		
+		System.out.println("Extracted min:");
+		heap.print();
 	}
 	
 	public static void main(String[] args) {
-		Integer[] mas = {3, 12, 15, 6, 1};
-		Comparator<Integer> cmp = new Comparator<Integer>() {
-			public int compare(Integer ob1, Integer ob2) {
-				return ob1.compareTo(ob2);
-			}
-		};
-		heapSort(mas, cmp);
-		
-		
+		Integer[] mas = {1, 34, 67, 3, -5, 67, 45, 0, 120, 4};		
+		heapSort(mas, Integer::compare);
+		System.out.println("Sorted mas: " + Arrays.toString(mas));
 	}
 }

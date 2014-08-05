@@ -74,7 +74,7 @@ public class SortWorking {
 	
 	public static void main(String[] args) {		
 		
-		Integer[] mas = {1, 34, 67, 3, 67, 45, 120, 4};
+		Integer[] mas = {1, 34, 67, 3, -5, 67, 45, 0, 120, 4};
 		Comparator<Integer> cmp = Integer::compare;
 		
 		mas = sort(mas, cmp);
@@ -86,18 +86,33 @@ public class SortWorking {
 	
 	static <T> T[] sort(T[] mas, Comparator<? super T> cmp) {
 		
-		List<Sorting> sorts = Arrays.asList(selectionSort, insertionSort, bubbleSort);
+		Sorting heapSort = new Sorting() {
+			@Override
+			public <K> void sort(K[] mas, Comparator<? super K> cmp) {
+				HeapSort.heapSort(mas, cmp);
+			}
+			@Override
+			public String toString() {
+				return HeapSort.class.getSimpleName();
+			}
+		};
+		
+		List<Sorting> sorts = Arrays.asList(selectionSort, insertionSort, bubbleSort, heapSort);
 		 
 		T[] result = null;
 		
-		for (int i = 0; i < sorts.size(); i ++) {
+		for (int i = 0; i < sorts.size(); i ++) {			
+			Sorting sort = sorts.get(i);
 			
-			System.out.printf("Sorting: %s\n", i);
+			String name = sort.getClass().getSimpleName();
+			if ("".equals(name)) {
+				name = sort.toString();
+			}
+			System.out.printf("%s. %s\n", i, name);
 			
 			//make a copy because array is modified during sorting
 			T[] copy = Arrays.copyOf(mas, mas.length);
-			
-			Sorting sort = sorts.get(i);			
+									
 			sort.sort(copy, cmp);
 			
 			if (result == null) {
