@@ -9,29 +9,34 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
-import static com.sort.ExternalMergeSort.bytesInRecord;
-
 /**
  * Output
  */
 public interface MergeOutput extends AutoCloseable {
 	
-	void writeRecord(int record) throws IOException;
+	void writeRecord(int record) throws IOException;					
 	
 	void close() throws IOException;
+	
+	public default void write(MergeRecords records) throws IOException {
+		for (int i = records.getStart(); i < records.getEnd(); i ++) {
+			int record = records.getRecord(i);
+			this.writeRecord(record);	
+		}						
+	}
 	
 	/**
 	 * Binary Output
 	 */
 	public static class OutputBinaryImpl implements MergeOutput {
-		private final File file;
+		//private final File file;
 		private final int blockSizeInBytes;
 		
 		private DataOutputStream out;
 		
-		public OutputBinaryImpl(File file, int blockSizeInBytes) throws IOException {
-			this.file = file;
-			this.blockSizeInBytes = blockSizeInBytes;
+		public OutputBinaryImpl(File file, int bytesInRecord, int blockSize) throws IOException {
+			//this.file = file;
+			this.blockSizeInBytes = blockSize * bytesInRecord;
 			
 			this.out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file), blockSizeInBytes));
 		}
@@ -55,27 +60,28 @@ public interface MergeOutput extends AutoCloseable {
 	 * Text Output
 	 */
 	public static class OutputTextImpl implements MergeOutput {
-		private final File file;
+		//private final File file;
 		private final int blockSizeInBytes;
+		private int bytesInRecord;
+		
+		private final char[] zeros;
 		
 		private Writer out;
 		
-		public OutputTextImpl(File file, int blockSizeInBytes) throws IOException {
-			this.file = file;
-			this.blockSizeInBytes = blockSizeInBytes;
-
+		public OutputTextImpl(File file, int bytesInRecord, int blockSize) throws IOException {
+			//this.file = file;
+			this.blockSizeInBytes = blockSize * bytesInRecord;
+			this.bytesInRecord = bytesInRecord;
+			
 			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"), blockSizeInBytes);
-		}
-
-		
-		static final char[] zeros;
-		static {
+			
+			//init zeros
 			zeros = new char[bytesInRecord];
 			for (int i = 0; i < bytesInRecord; i ++) {
 				zeros[i] = ' '; 
-			}
+			}				
 		}
-		
+								
 		public void writeRecord(int record) throws IOException {
 			//make it bytesInRecord					
 			

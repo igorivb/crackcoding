@@ -2,19 +2,21 @@ package com.sort;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
+import com.sort.MergeOutput.OutputBinaryImpl;
 import com.sort.MergeOutput.OutputTextImpl;
 
 //TODO: make it generic
 public class ExternalMergeSort {
 
 	private final File inputFile;
+	
+	private int bytesInRecord;
 	private final int blockSize;
 	private final int memorySize;
 	
@@ -23,75 +25,37 @@ public class ExternalMergeSort {
 	
 	private final Comparator<Integer> cmp;						
 	
-	
-	//TODO: don't hard code it
-	public final static int bytesInRecord = 8;
-	
-	public static class TimeMeasure {
-		long start;
-		long end;
-		String msg;
-		String indent = "";
-		
-		public TimeMeasure(String msg) {
-			this(msg, 0);
-		}
-		
-		public TimeMeasure(String msg, int ind) {
-			this.msg = msg;
-			
-			if (ind > 0) {
-				for (int i = 0; i < ind; i ++) {
-					indent = "  " + indent;
-				}
-			}
-			
-			start();
-			
-			System.out.println(indent + "Start - " + msg);
-		}				
-		
-		public void start() {
-			start = System.currentTimeMillis();
-		}
-		
-		public void end() {
-			end = System.currentTimeMillis();
-		}		
-		
-		public String diff() {
-			double val = (end - start) / 1000.0;
-			BigDecimal bd = new BigDecimal(val, new MathContext(4, RoundingMode.CEILING));			
-			return bd.toString();
-		}
-		
-		public void endAndPrint() {
-			end();
-			System.out.println(indent + "End - " + msg + ": " + diff());
-		}
-	}
-	
 	protected MergeInput createInput(File file) throws IOException {
-		return new InputTextImpl(file, this.blockSize, this.getBlockSizeInBytes());
+		if (binary) {
+			return new InputBinaryImpl(file, bytesInRecord, this.blockSize);	
+		} else {
+			return new InputTextImpl(file, bytesInRecord, this.blockSize);
+		}		
 	}
 	
-	protected MergeOutput createOutput(File file) throws IOException {
-		return new OutputTextImpl(file, this.getBlockSizeInBytes());
+	public static MergeOutput createOutput(File file, int bytesInRecord, int blockSize) throws IOException {
+		if (binary) {
+			return new OutputBinaryImpl(file, bytesInRecord, blockSize);			
+		} else {
+			return new OutputTextImpl(file, bytesInRecord, blockSize);
+		}				
 	}
 	
-	private void writeRecordsToFile(File file, int[] records, int fromIndex, int toIndex) throws IOException {				
-		try (MergeOutput out = this.createOutput(file)) {
-			for (int i = fromIndex; i < toIndex; i ++) {
-				int record = records[i];
-				out.writeRecord(record);	
-			}
+	protected MergeOutput createOutput(File file) throws IOException {		
+		return createOutput(file, this.bytesInRecord, this.blockSize);
+	}
+	
+	private void writeRecordsToFile(File file, MergeRecords records) throws IOException {				
+		try (MergeOutput out = this.createOutput(file)) {			
+			out.write(records);			
 		}
 	}
 	
-	public ExternalMergeSort(File inputFile, int blockSize, int memorySize,
+	public ExternalMergeSort(File inputFile, int bytesInRecord, int blockSize, int memorySize,
 			Comparator<Integer> cmp) throws IOException {
 		super();
 		this.inputFile = inputFile;
+		this.bytesInRecord = bytesInRecord;
 		this.blockSize = blockSize;
 		this.memorySize = memorySize;
 		this.cmp = cmp;
@@ -106,19 +70,22 @@ public class ExternalMergeSort {
 			throw new IOException(String.format("Failed to create working directory: %s", this.workingDir.getAbsolutePath()));
 		}
 		
+		System.out.println("Binary: " + binary);
+		System.out.println("Bytes in record: " + bytesInRecord);
 		System.out.println("Records in block: " + blockSize);
 		System.out.println("Blocks in memory: " + memorySize);
 		System.out.println("Blocks in file: " + blocksInFile);
 	}
 
 	private int calculateBlocksInFile() {
-		return divide((int) this.inputFile.length(), getBlockSizeInBytes());
+		int blockSizeInBytes = this.blockSize * bytesInRecord;
+		return divide((int) this.inputFile.length(), blockSizeInBytes);
 	}
 	
-	private int getBlockSizeInBytes() {
-		//this is because we work with int. Ideally it should come from Record class
-		return this.blockSize * bytesInRecord;
-	}
+//	private int getBlockSizeInBytes() {
+//		//this is because we work with int. Ideally it should come from Record class
+//		return this.blockSize * bytesInRecord;
+//	}
 	
 	protected void internalSort(int[] data, int fromIndex, int toIndex) {
 		Arrays.sort(data, fromIndex, toIndex);
@@ -161,7 +128,7 @@ public class ExternalMergeSort {
 		
 		for (int i = 0; i < iterationsCount; i ++) {						
 			
-			TimeMeasure iterTime = new TimeMeasure("Iteration in group", 1);
+			TimeMeasure iterTime = new TimeMeasure("Iterating in group: " + i, 1);
 			
 			//iterate files in group, find min element and write it to output			
 			int count = Math.min(filesToProcess, inputFiles.length - filesToProcess * i);		
@@ -232,15 +199,15 @@ public class ExternalMergeSort {
 				outputFiles[i] = outFile;
 							
 				TimeMeasure tRead = new TimeMeasure("Read from file", 2);				
-				MergeInput.Records records = in.read(this.memorySize);
+				MergeRecords records = in.read(this.memorySize);
 				tRead.endAndPrint();
 				
 				TimeMeasure tSort = new TimeMeasure("Internal sort", 2);
-				this.internalSort(records.getRecords(), 0, records.getSize());
+				this.internalSort(records.getRecords(), records.getStart(), records.getEnd());
 				tSort.endAndPrint();
 				
 				TimeMeasure tWrite = new TimeMeasure("Write to file", 2);
-				this.writeRecordsToFile(outFile, records.getRecords(), 0, records.getSize());
+				this.writeRecordsToFile(outFile, records);
 				tWrite.endAndPrint();
 				
 				t.endAndPrint();				
@@ -260,20 +227,20 @@ public class ExternalMergeSort {
 	 * @param cmp - comparator
 	 * @return output sorted file
 	 */
-	public static File sort(File inputFile, int blockSize, int memorySize, Comparator<Integer> cmp) throws IOException {
-		ExternalMergeSort sort = new ExternalMergeSort(inputFile, blockSize, memorySize, cmp);
+	public static File sort(File inputFile, int bytesInRecord, int blockSize, int memorySize, Comparator<Integer> cmp) throws IOException {
+		ExternalMergeSort sort = new ExternalMergeSort(inputFile, bytesInRecord, blockSize, memorySize, cmp);
 		return sort.sort();
 	}
 	
 	//method for testing
-	private static void prepareTestData(File file, int blockSize, int memorySize, int testRecords, boolean force) throws IOException {
+	private static void prepareTestData(File file, int bytesInRecord, int blockSize, int memorySize, int testRecords, boolean force) throws IOException {
 		if (file.exists() && !force) {			
 			return;			
 		}		
 		
 		TimeMeasure t = new TimeMeasure("Prepare test data");
-		
-		try (MergeOutput out = new OutputTextImpl(file, 5 * blockSize * bytesInRecord);) {
+				
+		try (MergeOutput out = createOutput(file, bytesInRecord, 5 * blockSize)) {
 			
 			Random rand = new Random(System.currentTimeMillis());
 			for (int i = 0, size = testRecords /*blockSize * memorySize * 10*/; i < size; i ++) {
@@ -285,7 +252,56 @@ public class ExternalMergeSort {
 		t.endAndPrint();
 	}
 	
+	static boolean binary = false;
+	
+	
+	static int binaryToText(File inputFile, File outputFile, int bytesInRecord, int blockSize, int memorySize) throws IOException {
+		
+		TimeMeasure t = new TimeMeasure("Binary to text");
+		
+		int recordsCount = 0;
+		
+		try (
+			InputBinaryImpl input = new InputBinaryImpl(inputFile, bytesInRecord, blockSize);
+			OutputTextImpl output = new OutputTextImpl(outputFile, /* double for text*/ bytesInRecord * 2, blockSize);
+		) {			
+			MergeRecords records = input.read(memorySize - 1);
+			while (!records.isEmpty()) {			
+				recordsCount += records.getSize();
+				output.write(records);
+				records = input.read(memorySize - 1);
+			}
+		}
+		
+		t.endAndPrint();
+		
+		return recordsCount;
+	}
+	
+	/**
+	 * Example of command line: 
+	 * --prepareTestData true --sort true --binaryToText true --binary true --removeTestData true
+	 * 
+	 * @param args
+	 * @throws IOException
+	 */
 	public static void main(String[] args) throws IOException {
+		
+		//process input params			
+		Map<String, String> params = new HashMap<>();		
+		for (int i = 0; i < args.length - 1; i += 2) {
+			String key = args[i].trim();
+			String value = args[i + 1].trim();						
+			params.put(key, value);			
+		}		
+		
+		boolean prepareTestData = Boolean.valueOf(params.get("--prepareTestData"));		 		
+		boolean binaryToText = Boolean.valueOf(params.get("--binaryToText"));		
+		boolean sort = Boolean.valueOf(params.get("--sort"));
+		
+		binary = Boolean.valueOf(params.get("--binary"));
+		boolean removeTestData = Boolean.valueOf(params.get("--removeTestData"));
+						
 		//minimal
 //		final int blockSize = 5;				
 //		final int memorySize = 4;
@@ -299,6 +315,12 @@ public class ExternalMergeSort {
 //		final int memorySize = 4;		
 //		final int testRecords = 10_000_000;
 		
+		
+		
+		//TODO: don't hard code it
+		int bytesInRecord = binary ? 4 : 8;		
+		
+		
 		/*
 		 * BlockSize - 10MB / bytesInRecord
 		 * Records: 100 millions
@@ -306,36 +328,55 @@ public class ExternalMergeSort {
 		//recordsCount: 1MB / bytesInRecord
 		final int blockSize = 10 * 1024 * 1024 / bytesInRecord;		
 		final int memorySize = 8;		
-		final int testRecords = 100_000_000;
+		final int testRecords = 100_000_000;														
+		
+		File sortOuputFile = null;
+		if (prepareTestData || sort) {
+			
+			File inputFile;
+			if (params.containsKey("--inputFile")) {
+				inputFile = new File(params.get("--inputFile"));
+			} else {
+				inputFile = new File("C:/Users/iburilo/git/crackcoding/Algorithms/resources/input.data");
+			}	
+		
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			System.out.println("Starting...");
+			
+			//prepare test data
+			if (prepareTestData) {
+				prepareTestData(inputFile, bytesInRecord, blockSize, memorySize, testRecords, removeTestData);
+			} 
+			
+			if (sort) {
+				//sort
+				Comparator<Integer> cmp = Integer::compareTo;	
 				
-		File inputFile;
-		if (args.length > 0) {
-			inputFile = new File(args[0]);
-		} else {
-			inputFile = new File("C:/Users/iburilo/git/crackcoding/Algorithms/resources/input.data");
-			prepareTestData(inputFile, blockSize, memorySize, testRecords, false);
-		}		
+				sortOuputFile = sort(inputFile, bytesInRecord, blockSize, memorySize, cmp);
+				System.out.printf("Output file: %s.\n", sortOuputFile.getAbsolutePath());		
+			}			
+		}
 		
-		Comparator<Integer> cmp = Integer::compareTo;	
-		
-		File outputFile = sort(inputFile, blockSize, memorySize, cmp);
-		System.out.printf("Output file: %s.\n", outputFile.getAbsolutePath());
-		
-		//output
-//		try (MergeInput in = new InputTextImpl(outputFile, blockSize, blockSize * bytesInRecord)) {
-//			while (true) {
-//				MergeInput.Records records = in.read(1);
-//				if (records.getSize() == 0) {
-//					break;
-//				}
-//				StringBuilder str = new StringBuilder();
-//				for (int i = 0; i < records.getSize(); i ++) {
-//					for (int record : records.getRecords()) {
-//						str.append(String.format("%2s", record)).append(",");		
-//					}								
-//				}	
-//				System.out.println(str);
-//			}			
-//		}	
+		//binary to text
+		if (binaryToText) {
+			File inputFile = null;
+			File outputFile = null;
+			
+			if (sort && binary) {
+				//in case of binary sort, we transform its output to text
+				inputFile = sortOuputFile;
+				outputFile = new File(inputFile.getParentFile(), "output-from-binary.data");
+			} else {
+				inputFile = new File("C:/Users/iburilo/git/crackcoding/Algorithms/resources/working-input.data-1407500615078/sort_1_0");
+				outputFile = new File("C:/Users/iburilo/git/crackcoding/Algorithms/resources/working-input.data-1407500615078/output-from-binary.data");
+			}
+						
+			int recordsCount = binaryToText(inputFile, outputFile, bytesInRecord, blockSize, memorySize);
+			System.out.println("BinaryToText, recordsCount: " + recordsCount);
+		} 
 	}
 }

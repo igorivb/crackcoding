@@ -17,13 +17,12 @@ public class InputBinaryImpl implements MergeInput {
 	private DataInputStream in;
 	
 	//cache block for reading record by record
-	private Records cachedBlock;
-	private int cacheIndex = 0;
+	private MergeRecords cachedBlock = MergeRecords.empty;
 					
-	public InputBinaryImpl(File file, int blockSize, int blockSizeInBytes) throws IOException {
+	public InputBinaryImpl(File file, int bytesInRecord, int blockSize) throws IOException {
 		this.file = file;
 		this.blockSize = blockSize;
-		this.blockSizeInBytes = blockSizeInBytes;
+		this.blockSizeInBytes = blockSize * bytesInRecord;
 		
 		//buffer = block
 		this.in = new DataInputStream(new BufferedInputStream(new FileInputStream(file), blockSizeInBytes));
@@ -36,12 +35,11 @@ public class InputBinaryImpl implements MergeInput {
 	 * @param blocksToRead
 	 * @return records
 	 */
-	public Records read(int blocksToRead) throws IOException {
+	public MergeRecords read(int blocksToRead) throws IOException {
 		if (this.hasData) {	
 			
 			//clear cache
-			this.cachedBlock = null;
-			this.cacheIndex = 0;
+			this.cachedBlock = MergeRecords.empty;
 			
 			int count = blocksToRead * blockSize;
 			int[] records = new int[count];
@@ -54,9 +52,9 @@ public class InputBinaryImpl implements MergeInput {
 			} catch (EOFException e) {
 				hasData = false;
 			}
-			return new Records(records, i);
+			return new MergeRecords(records, 0, i);
 		} else {
-			return Records.empty;
+			return MergeRecords.empty;
 		}
 	}
 
@@ -70,28 +68,25 @@ public class InputBinaryImpl implements MergeInput {
 	 * @return
 	 */
 	public Integer readRecord(boolean remove) throws IOException {
-		if (this.cachedBlock == null || this.cacheIndex >= this.cachedBlock.getSize()) {
-			Records records = this.read(1);
-			if (records.getSize() == 0) {
+		if (this.cachedBlock.isEmpty()) {
+			this.cachedBlock = this.read(1);
+			if (this.cachedBlock.isEmpty()) {
 				//no more data to read
-				return null;
-			} else {
-				this.cachedBlock = records;
-				this.cacheIndex = 0;
-			}
-		}
+				return null;				
+			}	
+		}			
 		
-		Integer record = this.cachedBlock.getRecords()[this.cacheIndex];
+		int start = this.cachedBlock.getStart();
+		Integer record = this.cachedBlock.getRecord(start);
 		if (remove) {
-			this.cacheIndex ++;
+			this.cachedBlock.setStart(start + 1);
 		}
 		return record;
 	}
 	
 	@Override
 	public void close() throws IOException {
-		 this.cachedBlock = null;
-		 this.cacheIndex = 0;
+		 this.cachedBlock = MergeRecords.empty;		 
 		 
 		 this.hasData = false;
 		 
@@ -101,5 +96,11 @@ public class InputBinaryImpl implements MergeInput {
 			 } catch (IOException ie) { /* ignore */ }
 			 this.in = null;
 		 }
-	}		
+	}
+	
+	@Override
+	public String toString() {
+		String str = String.format("%s[file: %s, blockSize: %s]", this.getClass().getSimpleName(), file.getAbsolutePath(), blockSize);
+		return str;
+	}
 }
