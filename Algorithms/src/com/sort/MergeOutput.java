@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
+import static com.sort.ExternalMergeSort.bytesInRecord;
+
 /**
  * Output
  */
@@ -65,10 +67,28 @@ public interface MergeOutput extends AutoCloseable {
 			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"), blockSizeInBytes);
 		}
 
+		
+		static final char[] zeros;
+		static {
+			zeros = new char[bytesInRecord];
+			for (int i = 0; i < bytesInRecord; i ++) {
+				zeros[i] = ' '; 
+			}
+		}
+		
 		public void writeRecord(int record) throws IOException {
 			//make it bytesInRecord					
-			String str = String.format("%" + ExternalMergeSort.bytesInRecord + "s", record);			
-			out.write(str);
+			
+			//String str = String.format("%" + bytesInRecord + "s", record);
+			
+			StringBuilder str = new StringBuilder(bytesInRecord);
+			str.append(record);
+			int diff = bytesInRecord - str.length();
+			if (diff > 0) {
+				str.insert(0, zeros, 0, diff);
+			}
+			
+			out.write(str.toString());
 		}
 		
 		@Override

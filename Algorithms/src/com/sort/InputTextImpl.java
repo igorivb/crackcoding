@@ -55,7 +55,15 @@ public class InputTextImpl implements MergeInput {
 					char[] cbuf = new char[ExternalMergeSort.bytesInRecord];
 					int c = in.read(cbuf);
 					if (c != -1) {
-						int record = Integer.valueOf(new String(cbuf).replaceAll(" ", ""));										
+						
+						//int record = Integer.valueOf(new String(cbuf).replaceAll(" ", ""));
+						
+						int offset = 0;
+						for (int n = cbuf.length; offset < n && cbuf[offset] == ' '; offset ++);
+						
+						String str = new String(cbuf, offset, cbuf.length - offset);
+						int record = Integer.valueOf(str);
+						
 						records[i] = record;	
 					} else {
 						break;

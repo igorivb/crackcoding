@@ -266,7 +266,7 @@ public class ExternalMergeSort {
 	}
 	
 	//method for testing
-	private static void prepareTestData(File file, int blockSize, int memorySize, boolean force) throws IOException {
+	private static void prepareTestData(File file, int blockSize, int memorySize, int testRecords, boolean force) throws IOException {
 		if (file.exists() && !force) {			
 			return;			
 		}		
@@ -276,7 +276,7 @@ public class ExternalMergeSort {
 		try (MergeOutput out = new OutputTextImpl(file, 5 * blockSize * bytesInRecord);) {
 			
 			Random rand = new Random(System.currentTimeMillis());
-			for (int i = 0, size = 10_000_000 /*blockSize * memorySize * 10*/; i < size; i ++) {
+			for (int i = 0, size = testRecords /*blockSize * memorySize * 10*/; i < size; i ++) {
 				int num = rand.nextInt(9999999); 
 				out.writeRecord(num);
 			}
@@ -286,21 +286,34 @@ public class ExternalMergeSort {
 	}
 	
 	public static void main(String[] args) throws IOException {
+		//minimal
 //		final int blockSize = 5;				
 //		final int memorySize = 4;
 		
-		//recordsCount: 1MB / bytesInRecord
-		final int blockSize = 1 * 1024 * 1024 / bytesInRecord;
+//		/*
+//		 * BlockSize - 1MB / bytesInRecord
+//		 * Records: 10millions
+//		 */
+//		//recordsCount: 1MB / bytesInRecord
+//		final int blockSize = 1 * 1024 * 1024 / bytesInRecord;		
+//		final int memorySize = 4;		
+//		final int testRecords = 10_000_000;
 		
-		//4 blocks
-		final int memorySize = 4;
+		/*
+		 * BlockSize - 10MB / bytesInRecord
+		 * Records: 100 millions
+		 */
+		//recordsCount: 1MB / bytesInRecord
+		final int blockSize = 10 * 1024 * 1024 / bytesInRecord;		
+		final int memorySize = 8;		
+		final int testRecords = 100_000_000;
 				
 		File inputFile;
 		if (args.length > 0) {
 			inputFile = new File(args[0]);
 		} else {
 			inputFile = new File("C:/Users/iburilo/git/crackcoding/Algorithms/resources/input.data");
-			prepareTestData(inputFile, blockSize, memorySize, false);
+			prepareTestData(inputFile, blockSize, memorySize, testRecords, false);
 		}		
 		
 		Comparator<Integer> cmp = Integer::compareTo;	
