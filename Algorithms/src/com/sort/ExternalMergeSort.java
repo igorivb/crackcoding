@@ -11,7 +11,17 @@ import java.util.Random;
 import com.sort.MergeOutput.OutputBinaryImpl;
 import com.sort.MergeOutput.OutputTextImpl;
 
-//TODO: make it generic
+/*
+ * TODO: 
+ * 1. make it generic
+ * 2. increase memory usage and check that there's no OutOfMemoryError, e.g.
+ *  blockSize = 10 * 1024 * 1024 / bytesInRecord;		
+ *	memorySize = 8;		
+ *	testRecords = 100_000_000;														
+ *		
+ * 
+ * TODO
+ */
 public class ExternalMergeSort {
 
 	private final File inputFile;
@@ -326,8 +336,8 @@ public class ExternalMergeSort {
 		 * Records: 100 millions
 		 */
 		//recordsCount: 1MB / bytesInRecord
-		final int blockSize = 10 * 1024 * 1024 / bytesInRecord;		
-		final int memorySize = 8;		
+		final int blockSize = 128 * 1024 * 1024 / bytesInRecord;		
+		final int memorySize = 8 * 2;		
 		final int testRecords = 100_000_000;														
 		
 		File sortOuputFile = null;

@@ -1,0 +1,61 @@
+Binary 
+
+
+Starting...
+Start - Prepare test data
+End - Prepare test data: 4.723
+Binary: true
+Bytes in record: 4
+Records in block: 2621440
+Blocks in memory: 8
+Blocks in file: 39
+Start - Sort
+Start - Partial Sort
+Partial sort, iterations count: 5
+  Start - PartialSort 0
+    Start - Read from file
+    End - Read from file: 0.4041
+    Start - Internal sort
+    End - Internal sort: 2.186
+    Start - Write to file
+    End - Write to file: 0.4421
+  End - PartialSort 0: 3.033
+  Start - PartialSort 1
+    Start - Read from file
+    End - Read from file: 0.3971
+    Start - Internal sort
+    End - Internal sort: 2.112
+    Start - Write to file
+    End - Write to file: 0.4320
+  End - PartialSort 1: 2.941
+  Start - PartialSort 2
+    Start - Read from file
+    End - Read from file: 0.5111
+    Start - Internal sort
+    End - Internal sort: 2.081
+    Start - Write to file
+    End - Write to file: 0.4260
+  End - PartialSort 2: 3.017
+  Start - PartialSort 3
+    Start - Read from file
+    End - Read from file: 0.5181
+    Start - Internal sort
+    End - Internal sort: 2.097
+    Start - Write to file
+    End - Write to file: 0.4370
+  End - PartialSort 3: 3.053
+  Start - PartialSort 4
+    Start - Read from file
+    End - Read from file: 0.5231
+    Start - Internal sort
+    End - Internal sort: 1.591
+    Start - Write to file
+    End - Write to file: 0.3881
+  End - PartialSort 4: 2.502
+End - Partial Sort: 14.55
+Start - Merging, iteration: 1, input files count: 5, iterations count: 1
+  Start - Iterating in group: 0
+  End - Iterating in group: 0: 12.24
+End - Merging, iteration: 1, input files count: 5, iterations count: 1: 12.24
+End - Sort: 26.79
+Output file: C:\Users\iburilo\git\crackcoding\Algorithms\resources\working-input.data-1407503919086\sort_1_0.

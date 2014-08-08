@@ -1,0 +1,106 @@
+Text
+
+Starting...
+Start - Prepare test data
+End - Prepare test data: 9.987
+Binary: false
+Bytes in record: 8
+Records in block: 1310720
+Blocks in memory: 8
+Blocks in file: 77
+Start - Sort
+Start - Partial Sort
+Partial sort, iterations count: 10
+  Start - PartialSort 0
+    Start - Read from file
+    End - Read from file: 0.9311
+    Start - Internal sort
+    End - Internal sort: 1.079
+    Start - Write to file
+    End - Write to file: 0.9251
+  End - PartialSort 0: 2.936
+  Start - PartialSort 1
+    Start - Read from file
+    End - Read from file: 0.8981
+    Start - Internal sort
+    End - Internal sort: 1.035
+    Start - Write to file
+    End - Write to file: 0.9520
+  End - PartialSort 1: 2.887
+  Start - PartialSort 2
+    Start - Read from file
+    End - Read from file: 1.166
+    Start - Internal sort
+    End - Internal sort: 1.071
+    Start - Write to file
+    End - Write to file: 0.9610
+  End - PartialSort 2: 3.198
+  Start - PartialSort 3
+    Start - Read from file
+    End - Read from file: 0.7951
+    Start - Internal sort
+    End - Internal sort: 1.029
+    Start - Write to file
+    End - Write to file: 0.9530
+  End - PartialSort 3: 2.778
+  Start - PartialSort 4
+    Start - Read from file
+    End - Read from file: 0.8470
+    Start - Internal sort
+    End - Internal sort: 1.063
+    Start - Write to file
+    End - Write to file: 0.9181
+  End - PartialSort 4: 2.827
+  Start - PartialSort 5
+    Start - Read from file
+    End - Read from file: 0.8130
+    Start - Internal sort
+    End - Internal sort: 1.027
+    Start - Write to file
+    End - Write to file: 0.9341
+  End - PartialSort 5: 2.775
+  Start - PartialSort 6
+    Start - Read from file
+    End - Read from file: 0.8051
+    Start - Internal sort
+    End - Internal sort: 1.043
+    Start - Write to file
+    End - Write to file: 0.9221
+  End - PartialSort 6: 2.771
+  Start - PartialSort 7
+    Start - Read from file
+    End - Read from file: 0.7921
+    Start - Internal sort
+    End - Internal sort: 1.017
+    Start - Write to file
+    End - Write to file: 0.8801
+  End - PartialSort 7: 2.690
+  Start - PartialSort 8
+    Start - Read from file
+    End - Read from file: 0.7831
+    Start - Internal sort
+    End - Internal sort: 1.013
+    Start - Write to file
+    End - Write to file: 1.011
+  End - PartialSort 8: 2.807
+  Start - PartialSort 9
+    Start - Read from file
+    End - Read from file: 0.4810
+    Start - Internal sort
+    End - Internal sort: 0.5241
+    Start - Write to file
+    End - Write to file: 0.4840
+  End - PartialSort 9: 1.490
+End - Partial Sort: 27.17
+Start - Merging, iteration: 1, input files count: 10, iterations count: 2
+  Start - Iterating in group: 0
+  End - Iterating in group: 0: 19.83
+  Start - Iterating in group: 1
+  End - Iterating in group: 1: 5.667
+End - Merging, iteration: 1, input files count: 10, iterations count: 2: 25.49
+Start - Merging, iteration: 2, input files count: 2, iterations count: 1
+  Start - Iterating in group: 0
+  End - Iterating in group: 0: 18.23
+End - Merging, iteration: 2, input files count: 2, iterations count: 1: 18.23
+End - Sort: 70.88
+Output file: C:\Users\iburilo\git\crackcoding\Algorithms\resources\working-input.data-1407503791153\sort_2_0.
