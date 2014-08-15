@@ -9,11 +9,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
 
 
 public class ExternalMergeSort2<T> {
+	
+	//need it for array creation
+	private Class<T> clazz;
 	
 	//in blocks
 	private int memorySize;
@@ -33,18 +37,26 @@ public class ExternalMergeSort2<T> {
 	 * @param <T> - record type
 	 */
 	interface IOFactory<T> {
-		Input<T> createInput(File file, int blockSize) throws IOException;
-		Output<T> createOutput(File file, int blockSize) throws IOException;
+		Input<T> createInput(File file) throws IOException;
+		Output<T> createOutput(File file) throws IOException;
 	}
 	
 	static class IntegerBinaryIOFactory implements IOFactory<Integer> {
 		
-		public Input<Integer> createInput(File file, int blockSize) throws IOException {
+		private int blockSize;
+				
+		public IntegerBinaryIOFactory(int blockSize) {
+			this.blockSize = blockSize;	
+		}
+		
+		@Override
+		public Input<Integer> createInput(File file) throws IOException {
 			Input<Integer> input = new IntegerBinaryInput(file, blockSize);
 			return input;
 		}
 
-		public Output<Integer> createOutput(File file, int blockSize) throws IOException {			
+		@Override
+		public Output<Integer> createOutput(File file) throws IOException {			
 			Output<Integer> output = new IntegerBinaryOutput(file, blockSize);
 			return output;
 		}
@@ -58,7 +70,8 @@ public class ExternalMergeSort2<T> {
 	public interface Input<T> extends AutoCloseable {		
 		void close() throws IOException;
 		int read(T[] records) throws IOException;
-		T readRecord(boolean remove) throws IOException;
+		T readRecord() throws IOException;
+		T peekRecord() throws IOException;
 		int getBlocksCount() throws IOException;
 	}
 
@@ -97,8 +110,8 @@ public class ExternalMergeSort2<T> {
 			return divide(this.file.length(), blockSize * bytesInRecord);
 		}
 		
-		@Override
-		public Integer readRecord(boolean remove) throws IOException {						
+		
+		private Integer readRecord(boolean remove) throws IOException {						
 			Integer record = null;
 			
 			if (hasData) {
@@ -114,6 +127,16 @@ public class ExternalMergeSort2<T> {
 			}
 			
 			return record;
+		}
+		
+		@Override
+		public Integer peekRecord() throws IOException {
+			return readRecord(false);	
+		}
+		
+		@Override
+		public Integer readRecord() throws IOException {
+			return readRecord(true);
 		}
 		
 		private Integer readRecord0() throws IOException {
@@ -184,19 +207,26 @@ public class ExternalMergeSort2<T> {
 		
 	}
 	
-	public ExternalMergeSort2(int memorySize, int blockSize, IOFactory<T> ioFactory, Comparator<T> cmp, File workingDir) {
+	public ExternalMergeSort2(Class<T> clazz, int memorySize, int blockSize, IOFactory<T> ioFactory, Comparator<T> cmp, File workingDir) throws IOException {
+		this.clazz = clazz;
 		this.memorySize = memorySize;
 		this.blockSize = blockSize;
 		this.cmp = cmp;
 		this.ioFactory = ioFactory;
 		this.workingDir = workingDir;
+		
+		if (!this.workingDir.exists()) {
+			if (!this.workingDir.mkdirs()) {
+				throw new IOException("Failed to created working dir: " + this.workingDir.getAbsolutePath());
+			}
+		}
 	}
 	
 	private File[] partialSort(File inputFile) throws IOException {
 		
 		File[] outputFiles = null;
 		
-		try (Input<T> input = ioFactory.createInput(inputFile, this.blockSize)) {
+		try (Input<T> input = ioFactory.createInput(inputFile)) {
 			
 			//reserve 1 block for output
 			int blocksToRead = this.memorySize - 1;
@@ -207,16 +237,19 @@ public class ExternalMergeSort2<T> {
 			
 			for (int i = 0; i < iterationsNum; i ++) {
 				//read
-				@SuppressWarnings("unchecked")			
-				T[] records = (T[]) new Object[blocksToRead * this.blockSize];				
-				int c = input.read(records);
+							
+				@SuppressWarnings("unchecked")
+				//T[] records = (T[]) new Object[blocksToRead * this.blockSize];								
+				T[] records = (T[]) Array.newInstance(clazz, blocksToRead * this.blockSize);  
 				
+				int c = input.read(records);
+				 
 				//sort
 				this.internalSort(records, c);
 				
 				//write
 				outputFiles[i] = this.getOutputFile(0, i);			
-				try (Output<T> output = ioFactory.createOutput(outputFiles[i], this.blockSize)) {
+				try (Output<T> output = ioFactory.createOutput(outputFiles[i])) {
 					output.write(records, c);	
 				}				
 			}
@@ -226,7 +259,7 @@ public class ExternalMergeSort2<T> {
 	}		
 
 	static int divide(long a, long b) {
-		return (int) Math.floor((double) a / b);
+		return (int) Math.ceil((double) a / b);
 	}
 
 	private void internalSort(T[] records, int len) {
@@ -234,7 +267,7 @@ public class ExternalMergeSort2<T> {
 	}	
 
 	private File getOutputFile(int group, int num) {
-		File file = new File(workingDir, "part_" + group + "_" + "num");
+		File file = new File(workingDir, "part_" + group + "_" + num + ".data");
 		return file;
 	}
 
@@ -251,7 +284,7 @@ public class ExternalMergeSort2<T> {
 		
 			//process group
 			outputFiles[i] = this.getOutputFile(stage, i);			
-			try (Output<T> output = ioFactory.createOutput(outputFiles[i], this.blockSize)) {
+			try (Output<T> output = ioFactory.createOutput(outputFiles[i])) {
 				
 				int inputsCount = Math.min(filesToProcessCount, inputFiles.length - i * filesToProcessCount);
 				
@@ -259,7 +292,7 @@ public class ExternalMergeSort2<T> {
 				@SuppressWarnings("unchecked")
 				Input<T> inputs[] = new Input[inputsCount];
 				for (int j = 0; j < inputsCount; j ++) {
-					inputs[j] = this.ioFactory.createInput(inputFiles[i * filesToProcessCount + j], this.blockSize);
+					inputs[j] = this.ioFactory.createInput(inputFiles[i * filesToProcessCount + j]);
 				}
 				
 				this.mergeGroup(inputs, output);
@@ -283,7 +316,7 @@ public class ExternalMergeSort2<T> {
 			int minIndex = -1;
 			
 			for (int i = 0; i < inputs.length; i ++) {				
-				T record = inputs[i].readRecord(false);
+				T record = inputs[i].peekRecord();
 				if (record != null && (min == null || cmp.compare(min, record) > 0)) {
 					min = record;
 					minIndex = i;
@@ -294,7 +327,7 @@ public class ExternalMergeSort2<T> {
 				output.writeRecord(min);
 				
 				//remove from input
-				inputs[minIndex].readRecord(true);				
+				inputs[minIndex].readRecord();				
 			} else {
 				break;
 			}
@@ -312,21 +345,6 @@ public class ExternalMergeSort2<T> {
 		}
 		
 		return runFiles[0];
-	}
-	
-	public static void main(String[] args) throws IOException {
-		//TODO: init values
-		int memorySize = 8;		
-		int blockSize = 100;
-		File inputFile = null;
-		IOFactory<Integer> ioFactory = new IntegerBinaryIOFactory(); 
-		Comparator<Integer> cmp = Integer::compare;
-		File workingDir = null;
-
-		
-		ExternalMergeSort2<Integer> sort = new ExternalMergeSort2<>(memorySize, blockSize, ioFactory, cmp, workingDir);
-		File output = sort.sort(inputFile);
-		System.out.println("Output: " + output.getAbsolutePath());
-	}
+	}		
 
 }
