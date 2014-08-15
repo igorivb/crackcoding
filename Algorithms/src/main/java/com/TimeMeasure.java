@@ -1,4 +1,4 @@
-package com.sort;
+package com;
 
 import java.math.BigDecimal;
 import java.math.MathContext;

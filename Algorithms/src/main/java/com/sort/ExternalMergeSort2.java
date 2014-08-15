@@ -13,8 +13,13 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class ExternalMergeSort2<T> {
+	
+	private static final Logger logger = LoggerFactory.getLogger(ExternalMergeSort2.class);
 	
 	//need it for array creation
 	private Class<T> clazz;
@@ -235,9 +240,15 @@ public class ExternalMergeSort2<T> {
 			
 			outputFiles = new File[iterationsNum];
 			
+			logger.debug("Partial sort, iterations count: {}", iterationsNum);
+			
 			for (int i = 0; i < iterationsNum; i ++) {
-				//read
-							
+				
+				outputFiles[i] = this.getOutputFile(0, i);
+				
+				logger.debug("Partial sort, iteration: {}, outputFile: {}", i, outputFiles[i]);
+				
+				//read							
 				@SuppressWarnings("unchecked")
 				//T[] records = (T[]) new Object[blocksToRead * this.blockSize];								
 				T[] records = (T[]) Array.newInstance(clazz, blocksToRead * this.blockSize);  
@@ -247,8 +258,7 @@ public class ExternalMergeSort2<T> {
 				//sort
 				this.internalSort(records, c);
 				
-				//write
-				outputFiles[i] = this.getOutputFile(0, i);			
+				//write							
 				try (Output<T> output = ioFactory.createOutput(outputFiles[i])) {
 					output.write(records, c);	
 				}				
@@ -278,12 +288,15 @@ public class ExternalMergeSort2<T> {
 		
 		int iterationsNum = divide(inputFiles.length, filesToProcessCount);
 		
-		File[] outputFiles = new File[iterationsNum];
+		File[] outputFiles = new File[iterationsNum];				
 		
 		for (int i = 0; i < iterationsNum; i ++) {
 		
 			//process group
-			outputFiles[i] = this.getOutputFile(stage, i);			
+			outputFiles[i] = this.getOutputFile(stage, i);
+			
+			logger.debug("Merging, stage: {}, iteration: {}, outputFile: {}", stage, i, outputFiles[i].getAbsolutePath());
+			
 			try (Output<T> output = ioFactory.createOutput(outputFiles[i])) {
 				
 				int inputsCount = Math.min(filesToProcessCount, inputFiles.length - i * filesToProcessCount);

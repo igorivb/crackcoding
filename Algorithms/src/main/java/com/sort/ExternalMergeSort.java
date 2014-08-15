@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import com.TimeMeasure;
 import com.sort.MergeOutput.OutputBinaryImpl;
 import com.sort.MergeOutput.OutputTextImpl;
 
