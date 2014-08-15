@@ -322,6 +322,7 @@ public class ExternalMergeSort2<T> {
 		IOFactory<Integer> ioFactory = new IntegerBinaryIOFactory(); 
 		Comparator<Integer> cmp = Integer::compare;
 		File workingDir = null;
+
 		
 		ExternalMergeSort2<Integer> sort = new ExternalMergeSort2<>(memorySize, blockSize, ioFactory, cmp, workingDir);
 		File output = sort.sort(inputFile);
