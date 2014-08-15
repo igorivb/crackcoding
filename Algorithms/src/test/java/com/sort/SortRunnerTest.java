@@ -4,9 +4,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import org.junit.Test;
+
 import com.Utils;
 
-public class SortRunner {
+public class SortRunnerTest {
 		
 	static class SelectionSort implements Sorting {
 		
@@ -66,20 +68,7 @@ public class SortRunner {
 		}
 		//not found
 		return -1;
-	}
-	
-	public static void main(String[] args) {		
-		
-		Integer[] mas = {1, 34, 67, 3, -5, 67, 45, 0, 120, 4};
-		Comparator<Integer> cmp = (Integer::compare);
-		//cmp = cmp.reversed();
-		
-		mas = sort(mas, cmp);
-				
-		int val = 120;
-		int res = binarySearch(mas, val, cmp);
-		System.out.printf("Search for %s. Result: %s\n", val, res);
-	}
+	}		
 	
 	static List<Sorting>  getSorts() {
 		
@@ -166,5 +155,19 @@ public class SortRunner {
 		
 		System.out.printf("Result: %s\n", Arrays.toString(result));
 		return result;
-	} 
+	}
+	
+	@Test
+	public void testSortings() {		
+		
+		Integer[] mas = {1, 34, 67, 3, -5, 67, 45, 0, 120, 4};
+		Comparator<Integer> cmp = (Integer::compare);
+		//cmp = cmp.reversed();
+		
+		mas = sort(mas, cmp);
+				
+		int val = 120;
+		int res = binarySearch(mas, val, cmp);
+		System.out.printf("Search for %s. Result: %s\n", val, res);
+	}
 }
