@@ -107,20 +107,31 @@ public class SortRunnerTest {
 			}
 		};
 		
-		Sorting mergeSortBottomUp = new Sorting() {
+//		Sorting mergeSortBottomUp = new Sorting() {
+//			public <K> void sort(K[] mas, Comparator<? super K> cmp) {
+//				MergeSort.sortBottomUp(mas, cmp);
+//			}
+//			@Override
+//			public String toString() {
+//				return "MergeSort#BottomUp";
+//			}
+//		};
+		
+		Sorting quickSort = new Sorting() {
 			public <K> void sort(K[] mas, Comparator<? super K> cmp) {
-				MergeSort.sortBottomUp(mas, cmp);
+				QuickSort.sort(mas, cmp);
 			}
 			@Override
 			public String toString() {
-				return "MergeSort#BottomUp";
+				return QuickSort.class.getSimpleName();
 			}
 		};
 		
 		List<Sorting> sorts = Arrays.asList(
 			selectionSort, insertionSort, bubbleSort, 
 			heapSort, heapSortWorking,
-			mergeSortTopDown, mergeSortBottomUp
+			mergeSortTopDown, //mergeSortBottomUp
+			quickSort
 		);
 		
 		return sorts;
