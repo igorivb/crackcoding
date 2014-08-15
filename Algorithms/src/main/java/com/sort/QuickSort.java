@@ -1,10 +1,9 @@
 package com.sort;
 
-import java.util.Arrays;
+import static com.Utils.swap;
+
 import java.util.Comparator;
 import java.util.Random;
-
-import static com.Utils.swap;
 
 public class QuickSort {
 
@@ -14,7 +13,7 @@ public class QuickSort {
 	
 	static <T> void sort(T[] mas, int start, int end, Comparator<T> cmp) {
 		if (end - start > 0) {
-			int pi = process(mas, start, end, cmp);
+			int pi = partition(mas, start, end, cmp);
 			
 			if (pi != start) {
 				sort(mas, start, pi - 1, cmp);	
@@ -33,7 +32,7 @@ public class QuickSort {
 		return res;
 	}
 	
-	static <T> int process(T[] mas, int start, int end, Comparator<T> cmp) {		
+	static <T> int partition(T[] mas, int start, int end, Comparator<T> cmp) {		
 		int pi = pickRandom(start, end);
 		T p = mas[pi];		
 		swap(mas, pi, start);
