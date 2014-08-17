@@ -7,11 +7,32 @@ import java.util.Comparator;
 import java.util.Random;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
-public class Task11_1Test {
+@RunWith(Parameterized.class)
+public class Task11_1TestParameterized {
 
+	int stage;
+	
+	public Task11_1TestParameterized(Integer stage, boolean some) {
+		this.stage = stage;
+		System.out.println("stage: " + stage);
+	}
+	
+	@Parameters
+	public static Iterable<Object[]> data() {
+		return Arrays.asList(new Object[][] {
+	      { 1, true },
+	      { 2, true },
+	    });
+	}
+	
 	@Test
 	public void test1() {
+		System.out.println("  test1: " + stage);
+		
 		Comparator<Integer> cmp = Integer::compare;
 		int aSize = 3;
 		Integer[] a = new Integer[8];
@@ -36,6 +57,8 @@ public class Task11_1Test {
 	
 	@Test
 	public void testRandom() {
+		System.out.println("  testRandom: " + stage);
+		
 		Random rand = new Random(System.currentTimeMillis());
 		
 		Comparator<Integer> cmp = Integer::compare;
