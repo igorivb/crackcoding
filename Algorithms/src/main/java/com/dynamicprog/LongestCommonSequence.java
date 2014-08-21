@@ -10,7 +10,7 @@ public class LongestCommonSequence {
 	} 
 	
 	//top-down
-	public static <T> Object[] lcs(T[] x, T[] y, int i, int j) {
+	public static <T> Object[] lcsTopDown(T[] x, T[] y, int i, int j) {
 		Integer[][] m = new Integer[i + 1][j + 1];
 		m[0][0] = 0;
 				
@@ -51,7 +51,42 @@ public class LongestCommonSequence {
 		m[i][j] = len;		 				
 		
 		return len;
-	}		
+	}	
+	
+	/*
+	 * i - length for x
+	 * j - length for y
+	 */
+	public static <T> Object[] lcsBottomUp(T[] x, T[] y, int xLen, int yLen) {
+		int[][] m = new int[xLen + 1][yLen + 1];
+				
+		Solution[][] s = new Solution[xLen][yLen];
+				
+		for (int i = 1; i <= xLen; i ++) {
+			for (int j = 1; j <= yLen; j ++) {				
+				int len;		
+				if (i == 0 || j == 0) {
+					len = 0;			
+				} else if (x[i - 1].equals(y[j - 1])) {
+					len = m[i - 1][j - 1] + 1;
+					s[i - 1][j - 1] = Solution.EQ; 
+				} else {
+					int l1 = m[i - 1][j];
+					int l2 = m[i][j - 1];
+					if (l1 <= l2) {
+						len = l2;
+						s[i - 1][j - 1] = Solution.Y;
+					} else {
+						len = l1;
+						s[i - 1][j - 1] = Solution.X;
+					}				
+				}						
+				m[i][j] = len;		 												
+			}
+		}
+		
+		return new Object[] {m[xLen][yLen], s};
+	}
 	
 	static <T> List<String> getSolutionAsString(Solution[][] solution, T[] x, T[] y) {
 		List<String> solList = new LinkedList<>();
@@ -80,18 +115,20 @@ public class LongestCommonSequence {
 	}
 	
 	public static void main(String[] args) {
+		//Len:  4, solution: [B, D, A, B]		  
 		String[] x = new String[] { "A", "B", "C", "B", "D", "A", "B" };
 		String[] y = new String[] {"B", "D", "C", "A", "B", "A"};
 		
+		//Len: 20, solution: [G, T, C, G, T, C, G, G, A, A, G, C, C, G, G, C, C, G, A, A]
 //		String[] x = toStringArray("ACCGGTCGAGTGCGCGGAAGCCGGCCGAA");
 //		String[] y = toStringArray("GTCGTTCGGAATGCCGTTGCTCTGTAAA");
 		
-		Object[] res = lcs(x, y, x.length, y.length);
+		Object[] res = lcsBottomUp(x, y, x.length, y.length);
 		int len = (int) res[0];				
 		
 		List<String> solution = getSolutionAsString((Solution[][]) res[1], x, y);
 				
-		System.out.printf("Len: %2s, solution: %s\n", len, solution);		
+		System.out.printf("Len: %2s, solution: %s\n", len, solution);					
 	}
 	
 	static String[] toStringArray(String str) {
