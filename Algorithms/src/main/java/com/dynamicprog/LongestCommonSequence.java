@@ -85,7 +85,7 @@ public class LongestCommonSequence {
 			}
 		}
 		
-		return new Object[] {m[xLen][yLen], s};
+		return new Object[] {m[xLen][yLen], s, m};
 	}
 	
 	static <T> List<String> getSolutionAsString(Solution[][] solution, T[] x, T[] y) {
@@ -114,6 +114,24 @@ public class LongestCommonSequence {
 		return solList;
 	}
 	
+	static <T> List<String> getSolution2AsString(int[][] m, T[] x, T[] y) {
+		LinkedList<String> list = new LinkedList<>();
+		for (int i = x.length, j = y.length; i > 0 && j > 0;) {
+			if (x[i - 1] == y[j - 1]) {
+				list.addFirst(String.valueOf(x[i - 1]));
+				i --;
+				j --;
+			} else {
+				if (m[i - 1][j] > m[i][j - 1]) {
+					i --;
+				} else {
+					j --;
+				}
+			}
+		}
+		return list;
+	}
+	
 	public static void main(String[] args) {
 		//Len:  4, solution: [B, D, A, B]		  
 		String[] x = new String[] { "A", "B", "C", "B", "D", "A", "B" };
@@ -126,7 +144,11 @@ public class LongestCommonSequence {
 		Object[] res = lcsBottomUp(x, y, x.length, y.length);
 		int len = (int) res[0];				
 		
-		List<String> solution = getSolutionAsString((Solution[][]) res[1], x, y);
+		List<String> solution;
+		
+		//solution = getSolutionAsString((Solution[][]) res[1], x, y);
+		
+		solution = getSolution2AsString((int[][]) res[2], x, y);
 				
 		System.out.printf("Len: %2s, solution: %s\n", len, solution);					
 	}
