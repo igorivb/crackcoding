@@ -6,7 +6,12 @@ import java.util.List;
 
 public class LongestIncreasingSubsenquence {
 
-	public static <T> int[] lis(T[] mas, Comparator<T> cmp) {
+	/**
+	 * res[0] - len
+	 * res[1] - int[] solution
+	 */
+	public static <T> Object[] lis(T[] mas, Comparator<T> cmp) {
+		int maxLen = 0;
 		int[] c = new int[mas.length];
 		for (int i = 0; i < mas.length; i ++) {			
 			int max = 0;
@@ -16,40 +21,40 @@ public class LongestIncreasingSubsenquence {
 				}
 			}
 			c[i] = max + 1;
+			maxLen = Math.max(maxLen, c[i]);
 		}
-		return c;
+		return new Object[]{maxLen, c};
 	}
 	
-	private static <T> List<T> getSolutionPath(T[] mas, int[] sol, Comparator<T> cmp) {
+	private static <T> List<T> getSolutionPath(T[] mas, int len, int[] sol, Comparator<T> cmp) {
 		LinkedList<T> list = new LinkedList<>();
-		
-		T val = mas[mas.length - 1];
-		int c = sol[mas.length - 1];
-		list.add(val);
-		
-		for (int i = mas.length - 2; i >= 0; i --) {
-			if (sol[i] == c - 1 && cmp.compare(mas[i], val) < 0) {
+		int lenInd = -1;
+		for (int i = sol.length - 1; i >= 0; i --) {
+			if (sol[i] == len && (lenInd == -1 || cmp.compare(mas[i], mas[lenInd]) < 0)) {
 				list.addFirst(mas[i]);
-				c --;
-				val = mas[i];
+				//list.set(len - 1, mas[i]);
+				len --;
+				lenInd = i;
 			}
 		} 		
 		return list;
 	}
 	
 	public static void main(String[] args) {
-		//Integer[] mas = new Integer[] {1, 4, 3, 5, 7, 10, 6, 8};
-		
-		Integer[] mas = new Integer[] {10, 22, 9, 33, 21, 50, 41, 60, 80};
+		//Integer[] mas = new Integer[] {1, 4, 3, 5, 7, 10, 6, 8, 2};		
+		//Integer[] mas = new Integer[] {10, 22, 9, 33, 21, 50, 41, 60, 80, 4, 89, 12};
+		Integer[] mas = new Integer[] {0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15};
 		
 		Comparator<Integer> cmp = Integer::compare;
 		
-		int[] solution = lis(mas, cmp);
-		int len = solution[solution.length - 1];
+		Object[] res = lis(mas, cmp);		
+		int len = (int) res[0];
 		
-		List<Integer> list = getSolutionPath(mas, solution, cmp) ;
+		int[] solution = (int[]) res[1];
+		List<Integer> objList = getSolutionPath(mas, len, solution, cmp) ;
+		//Integer[] list = (Integer[]) objList;
 		
-		System.out.printf("Len : %2s, solution: %s\n", len, list);
+		System.out.printf("Len : %2s, solution: %s\n", len, objList);
 	}
 
 
