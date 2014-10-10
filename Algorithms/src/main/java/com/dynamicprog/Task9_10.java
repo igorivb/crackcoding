@@ -60,8 +60,6 @@ public class Task9_10 {
 		int len = input.length - pathInd;
 		if (len > 0) {
 			//iterate remaining elements
-			Box[] remaining = new Box[len];
-			int remainingInd = 0;
 			for (int i = 0; i < input.length; i ++) {
 				boolean contains = false;
 				for (int j = 0; j < pathInd; j ++) {
@@ -70,16 +68,13 @@ public class Task9_10 {
 						break;
 					}
 				}
+				
 				if (!contains) {
-					remaining[remainingInd ++] = input[i];
-				}
-			}
-			
-			for (int i = 0; i < len; i ++) {
-				path[pathInd] = remaining[i];
-				if (isValid(path, pathInd)) {
-					//go down
-					process(path, pathInd + 1, input, result);
+					path[pathInd] = input[i];
+					if (isValid(path, pathInd)) {
+						//go down
+						process(path, pathInd + 1, input, result);
+					}
 				}
 			}
 		}		
