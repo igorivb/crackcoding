@@ -23,6 +23,20 @@ public final class Utils {
 		}
 	}
 	
+	public static void printMatrixSimple(int[][] mas) {
+		printMatrixSimple(mas, 2);
+	}
+	
+	public static void printMatrixSimple(int[][] mas, int format) {
+		String strFormat = "%"+format+"s| ";
+		for (int i = 0; i < mas.length; i ++) {
+			for (int j = 0; j < mas[i].length; j ++) {
+				System.out.printf(strFormat, mas[i][j]);
+			}
+			System.out.println();
+		}
+	}
+	
 	public static String toStringArrayWithIndexes(int[] mas) {
 		StringBuilder str = new StringBuilder();
 		for (int i = 0; i < mas.length; i ++) {
