@@ -8,19 +8,11 @@ import java.util.Set;
  * FOLLOW UP
  * How would you solve this problem if a temporary buffer is not allowed?
  */
-public class Task2_1 {
-
-	static class Node {
-		Object value;
-		Node next;
-		public Node(Object value) {
-			this.value = value;
-		}
-	}
+public class Task2_1 {	
 	
-	public static void removeDuplicates(Node n) {		
+	public static void removeDuplicates(SingleLinkedNode n) {		
 		Set<Object> map = new HashSet<>();
-		for (Node prev = null; n != null; n = n.next) {
+		for (SingleLinkedNode prev = null; n != null; n = n.next) {
 			if (map.contains(n.value)) {
 				prev.next = n.next;
 				//n.next = null;
@@ -31,9 +23,9 @@ public class Task2_1 {
 		}
 	}
 	
-	public static void removeDuplicatesNoBuffer(Node node) {
-		for (Node i = node; i != null; i = i.next) {			
-			for (Node j = i; j.next != null;) {
+	public static void removeDuplicatesNoBuffer(SingleLinkedNode node) {
+		for (SingleLinkedNode i = node; i != null; i = i.next) {			
+			for (SingleLinkedNode j = i; j.next != null;) {
 				if (i.value.equals(j.next.value)) {
 					j.next = j.next.next; //remove
 				} else {
@@ -44,11 +36,11 @@ public class Task2_1 {
 	}
 	
 	public static void main(String[] args) {
-		Node n1 = new Node("a");
-		Node n2 = new Node("b");
-		Node n3 = new Node("a");
-		Node n4 = new Node("a");
-		Node n5 = new Node("c");
+		SingleLinkedNode n1 = new SingleLinkedNode("a");
+		SingleLinkedNode n2 = new SingleLinkedNode("b");
+		SingleLinkedNode n3 = new SingleLinkedNode("a");
+		SingleLinkedNode n4 = new SingleLinkedNode("a");
+		SingleLinkedNode n5 = new SingleLinkedNode("c");
 		
 		n1.next = n2;
 		n2.next = n3;
@@ -57,7 +49,7 @@ public class Task2_1 {
 		
 		removeDuplicatesNoBuffer(n1);
 		
-		for (Node n = n1; n != null; n = n.next) {
+		for (SingleLinkedNode n = n1; n != null; n = n.next) {
 			System.out.println(n.value);
 		}
 	}

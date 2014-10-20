@@ -5,40 +5,28 @@ package com.datastructure.linkedlist;
  */
 public class Task2_2 {
 
-	static class Node {
-		Object value;
-		Node next;
-		public Node(Object value) {
-			this.value = value;
-		}
-		@Override
-		public String toString() {
-			return this.value.toString();
-		}
-	}
-	
 	static class Result {
-		Node node;
+		SingleLinkedNode node;
 	}
 	
-	public static Node findElem(Node node, int k) {
+	public static SingleLinkedNode findElem(SingleLinkedNode node, int k) {
 		int size = 0;
-		for (Node n = node; n != null; n = n.next, size ++);
+		for (SingleLinkedNode n = node; n != null; n = n.next, size ++);
 		if (k >= size) {
 			return null;
 		}
-		Node n = node;
+		SingleLinkedNode n = node;
 		for (int i = 0; i < size - k - 1; i ++, n = n.next);
 		return n;
 	}
 	
-	public static Node findElemRecursive(Node node, int k) {
+	public static SingleLinkedNode findElemRecursive(SingleLinkedNode node, int k) {
 		Result res = new Result();
 		findElemRecursive0(node, k, res);
 		return res.node;
 	}
 	
-	static int findElemRecursive0(Node node, int k, Result res) {
+	static int findElemRecursive0(SingleLinkedNode node, int k, Result res) {
 		if (node == null) {
 			return -1;
 		}
@@ -50,11 +38,11 @@ public class Task2_2 {
 	}
 	
 	public static void main(String[] args) {
-		Node n1 = new Node("a");
-		Node n2 = new Node("b");
-		Node n3 = new Node("a1");
-		Node n4 = new Node("a2");
-		Node n5 = new Node("c");
+		SingleLinkedNode<String> n1 = new SingleLinkedNode<>("a");
+		SingleLinkedNode<String> n2 = new SingleLinkedNode<>("b");
+		SingleLinkedNode<String> n3 = new SingleLinkedNode<>("a1");
+		SingleLinkedNode<String> n4 = new SingleLinkedNode<>("a2");
+		SingleLinkedNode<String> n5 = new SingleLinkedNode<>("c");
 		
 		n1.next = n2;
 		n2.next = n3;
@@ -62,8 +50,8 @@ public class Task2_2 {
 		n4.next = n5;
 		
 		for (int i = 0; i <= 5; i ++) {
-			Node res1 = findElem(n1, i);
-			Node res2 = findElemRecursive(n1, i);
+			SingleLinkedNode<String> res1 = findElem(n1, i);
+			SingleLinkedNode<String> res2 = findElemRecursive(n1, i);
 			System.out.printf("%2s. %2s, %2s%n", i, res1, res2);
 		}
 		

@@ -1,5 +1,6 @@
 package com;
 
+
 public final class Utils {
 
 	private Utils() { }
@@ -52,5 +53,5 @@ public final class Utils {
 		String str = Integer.toBinaryString((b & 0xFF));
 		str = String.format("%8s", str).replaceAll(" ", "0");
 		return str;
-	}
+	}		
 }
