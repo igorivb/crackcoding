@@ -3,7 +3,7 @@ package com.datastructure;
 import java.util.Arrays;
 import java.util.EmptyStackException;
 
-public class StackOnArray<T> {
+public class StackOnArray<T> implements StackDef<T> {
 
 	Object[] mas;
 	int top = 0;
@@ -28,6 +28,15 @@ public class StackOnArray<T> {
 		@SuppressWarnings("unchecked")
 		T obj = (T) mas[top];
 		mas[top] = null;		
+		return obj;
+	}
+	
+	public T peek() {
+		if (this.isEmpty()) {
+			throw new EmptyStackException();
+		}		
+		@SuppressWarnings("unchecked")
+		T obj = (T) mas[top - 1];		
 		return obj;
 	}
 	
