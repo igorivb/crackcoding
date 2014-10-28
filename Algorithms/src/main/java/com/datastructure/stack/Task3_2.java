@@ -75,6 +75,12 @@ public class Task3_2 {
 		public T min() {
 			return min != null ? min.val : null;
 		}
+
+		@Override
+		public int size() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
 	}
 	
 	//---------------------------

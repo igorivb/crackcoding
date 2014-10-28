@@ -2,7 +2,7 @@ package com.datastructure;
 
 public interface StackDef<T> {
 	
-	void push(T obj);
+	void push(T val);
 	
 	/** 
 	 * @throws EmptyStackException
@@ -15,4 +15,6 @@ public interface StackDef<T> {
 	T peek();
 	
 	boolean isEmpty();
+	
+	int size();
 }

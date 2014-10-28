@@ -5,11 +5,15 @@ import java.util.EmptyStackException;
 
 public class StackOnArray<T> implements StackDef<T> {
 
-	Object[] mas;
-	int top = 0;
+	private Object[] mas;
+	private int top = 0;
 	
 	public StackOnArray() {
-		mas = new Object[8];
+		this(8);
+	}
+	
+	public StackOnArray(int defaultSize) {
+		mas = new Object[defaultSize];
 	}
 	
 	public void push(T obj) {
@@ -53,5 +57,10 @@ public class StackOnArray<T> implements StackDef<T> {
 		stack.push("c");
 		System.out.println(stack.pop());		
 		System.out.println("empty: " + stack.isEmpty());
+	}
+
+	@Override
+	public int size() {		
+		return top;
 	}
 }
