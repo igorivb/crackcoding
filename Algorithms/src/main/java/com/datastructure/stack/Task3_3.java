@@ -35,7 +35,7 @@ public class Task3_3 {
 			
 			stacks = new StackOnArray[1];
 			curStack = 0;
-			stacks[0] = new StackOnArray<T>(this.stackSize);			
+			stacks[0] = new StackOnArray<T>(this.stackSize, true);			
 		}
 
 		@Override
@@ -45,7 +45,7 @@ public class Task3_3 {
 				
 				if (curStack == stacks.length) { //extend array
 					stacks = Arrays.copyOf(stacks, stacks.length + 1);
-					stacks[curStack] = new StackOnArray<T>(this.stackSize);
+					stacks[curStack] = new StackOnArray<T>(this.stackSize, true);
 				}
 			}
 			

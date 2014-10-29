@@ -7,17 +7,22 @@ public class StackOnArray<T> implements StackDef<T> {
 
 	private Object[] mas;
 	private int top = 0;
+	private boolean canExpand;
 	
 	public StackOnArray() {
-		this(8);
+		this(8, true);
 	}
 	
-	public StackOnArray(int defaultSize) {
+	public StackOnArray(int defaultSize, boolean canExpand) {
 		mas = new Object[defaultSize];
+		this.canExpand = canExpand;
 	}
 	
 	public void push(T obj) {
-		if (top == mas.length) {			
+		if (top == mas.length) {
+			if (!canExpand) {
+				throw new IllegalStateException("Stack is full. Size: " + this.size());
+			}
 			mas = Arrays.copyOf(mas, mas.length << 1); //extend array
 		}
 		mas[top ++] = obj;
@@ -62,5 +67,15 @@ public class StackOnArray<T> implements StackDef<T> {
 	@Override
 	public int size() {		
 		return top;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder res = new StringBuilder("[");
+		for (int i = top - 1; i >= 0; i --) {
+			res.append(mas[i]).append(",");
+		}
+		res.append("]");
+		return res.toString();
 	}
 }
