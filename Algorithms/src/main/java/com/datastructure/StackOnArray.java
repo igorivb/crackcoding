@@ -73,7 +73,10 @@ public class StackOnArray<T> implements StackDef<T> {
 	public String toString() {
 		StringBuilder res = new StringBuilder("[");
 		for (int i = top - 1; i >= 0; i --) {
-			res.append(mas[i]).append(",");
+			res.append(mas[i]);
+			if (i > 0) {
+				res.append(",");
+			}
 		}
 		res.append("]");
 		return res.toString();
