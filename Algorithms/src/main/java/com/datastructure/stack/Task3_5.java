@@ -8,21 +8,23 @@ import com.datastructure.StackOnArray;
  */
 public class Task3_5<T> {
 
-	private StackDef<T> stack1 = new StackOnArray<T>();
-	private StackDef<T> stack2 = new StackOnArray<T>();
+	private StackDef<T> newStack = new StackOnArray<T>();
+	private StackDef<T> oldStack = new StackOnArray<T>();
 	
 	public void add(T elem) {
-		stack1.push(elem);
+		newStack.push(elem);
 	}
-	
+			
 	public T remove() {
-		while (!stack1.isEmpty()) {
-			stack2.push(stack1.pop());
-		}
-		T res = stack2.pop();
-		while (!stack2.isEmpty()) {
-			stack1.push(stack2.pop());
-		}		
-		return res;
+		shiftStacks();	
+		return oldStack.pop();
+	}
+
+	private void shiftStacks() {
+		if (oldStack.isEmpty()) {
+			while (!newStack.isEmpty()) {
+				oldStack.push(newStack.pop());
+			}
+		}			
 	}	
 }
