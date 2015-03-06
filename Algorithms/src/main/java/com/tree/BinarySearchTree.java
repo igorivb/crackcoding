@@ -25,8 +25,8 @@ public class BinarySearchTree<T extends Comparable<T>> {
 		if (n.left != null) {
 			return maximum(n.left);
 		} else {			
-			for (; n.parent != null && n.parent.isLeftChild(n); n = n.parent);
-			return n.parent;			
+			for (; n.p != null && n.p.isLeftChild(n); n = n.p);
+			return n.p;			
 		}
 	}
 	
@@ -34,8 +34,8 @@ public class BinarySearchTree<T extends Comparable<T>> {
 		if (n.right != null) {
 			return minimum(n.right);
 		} else {			
-			for (; n.parent != null && n.parent.isRightChild(n); n = n.parent);
-			return n.parent;			
+			for (; n.p != null && n.p.isRightChild(n); n = n.p);
+			return n.p;			
 		}
 	}
 	
@@ -64,7 +64,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
 			cur = p;	
 		}
 							
-		n.parent = cur;
+		n.p = cur;
 		if (cur == null) {
 			root = n;
 		} else if (n.key.compareTo(cur.key) < 0) {
@@ -104,19 +104,19 @@ public class BinarySearchTree<T extends Comparable<T>> {
 		visit(n);
 	}	
 	
-	private void visit(TreeNode<T> n) {
-		System.out.print(n.key + " ");		
+	protected void visit(TreeNode<T> n) {
+		System.out.print(n + " ");		
 	}
 	
 	public void setRoot(TreeNode<T> n) {
 		root = n;
 		if (root != null) {
-			root.parent = null;	
+			root.p = null;	
 		}			
 	}
 	
 	public void delete(TreeNode<T> n) {
-		TreeNode<T> p = n.parent;
+		TreeNode<T> p = n.p;
 		if (n.left == null && n.right == null) { //no children
 			if (p != null) {
 				p.replaceChild(n, null);
@@ -132,7 +132,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
 			}
 		} else { //2 children
 			TreeNode<T> min = minimum(n.right);
-			TreeNode<T> minParent = min.parent;
+			TreeNode<T> minParent = min.p;
 			TreeNode<T> minRight = min.right;
 			
 			if (p != null) {
@@ -151,7 +151,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
 	}
 	
 	public void delete1(TreeNode<T> n) {
-		TreeNode<T> p = n.parent; // can be null
+		TreeNode<T> p = n.p; // can be null
 			
 		if (n.left == null && n.right == null) { //no children			
 			if (p != null) { //delete node from parent
@@ -164,18 +164,18 @@ public class BinarySearchTree<T extends Comparable<T>> {
 				p.replaceChild(n, child);
 			} else {
 				root = child;
-				child.parent = null;
+				child.p = null;
 			}
 		} else { //both children
 			TreeNode<T> min = minimum(n.right);
 			TreeNode<T> minRight = min.right; //can be null
-			TreeNode<T> minParent = min.parent;
+			TreeNode<T> minParent = min.p;
 
 			if (p != null) {
 				p.replaceChild(n, min);				
 			} else {
 				root = min;
-				min.parent = null;
+				min.p = null;
 			}
 			
 			min.setLeft(n.left);
@@ -222,5 +222,29 @@ public class BinarySearchTree<T extends Comparable<T>> {
 		tree.delete(tree.search(tree.root, 6));
 		tree.delete(tree.search(tree.root, 17));
 		tree.inOrderTreeWalk(tree.root);
+	}
+	
+	public void printHierarchy(TreeNode<T> n) {
+		printHierarchy(n, 0);
+	}
+	
+	public void printHierarchy(TreeNode<T> n, int indent) {
+		System.out.println(n);
+		if (n.left != null) {
+			System.out.print(ind(indent + 1) + "left: ");
+			printHierarchy(n.left, indent + 1);
+		}
+		if (n.right != null) {
+			System.out.print(ind(indent + 1) + "right: ");
+			printHierarchy(n.right, indent + 1);
+		}
+	}
+
+	String ind(int indent) {
+		StringBuilder str = new StringBuilder();
+		for (int i = 0; i < indent; i ++) {
+			str.append("  ");
+		}
+		return str.toString();
 	}
 }

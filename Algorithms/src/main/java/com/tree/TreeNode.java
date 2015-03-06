@@ -2,27 +2,43 @@ package com.tree;
 
 public class TreeNode<T extends Comparable<T>> {
 
+	enum Color { BLACK, RED }
+	
 	public final T key;
 	public Object data;
 	
 	public TreeNode<T> left;
 	public TreeNode<T> right;
-	public TreeNode<T> parent;
+	public TreeNode<T> p;
 	
-	public TreeNode(T key) {
+	public Color color = Color.RED;
+	
+	public TreeNode(T key, Color color) {
 		if (key == null) {
 			throw new NullPointerException("key");
 		}
 		this.key = key;
+		this.color = color;
+	}
+	
+	public TreeNode(T key) {
+		this(key, Color.RED);
 	}
 	
 	public TreeNode<T> setLeft(TreeNode<T> n) {
 		if (this.left != null) {
-			this.left.parent = null;
+			this.left.p = null;
 		}
 		this.left = n;		
 		if (n != null) {
-			n.parent = this;	
+			if (n.p != null) { //clear n from its parent
+				if (n.p.isLeftChild(n)) {
+					n.p.left = null;
+				} else {
+					n.p.right = null;
+				}				
+			}
+			n.p = this;	
 		}
 		
 		return this;
@@ -30,11 +46,18 @@ public class TreeNode<T extends Comparable<T>> {
 	
 	public TreeNode<T> setRight(TreeNode<T> n) {
 		if (this.right != null) {
-			this.right.parent = null;
+			this.right.p = null;
 		}
 		this.right = n;
 		if (n != null) {
-			n.parent = this;
+			if (n.p != null) { //clear n from its parent
+				if (n.p.isLeftChild(n)) {
+					n.p.left = null;
+				} else {
+					n.p.right = null;
+				}				
+			}
+			n.p = this;
 		}
 		
 		return this;
@@ -58,7 +81,7 @@ public class TreeNode<T extends Comparable<T>> {
 
 	@Override
 	public String toString() {
-		return key.toString();
+		return "{" + key.toString() + " " + color + "}";
 	}
 
 	@Override
