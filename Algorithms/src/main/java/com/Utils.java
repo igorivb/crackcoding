@@ -54,4 +54,12 @@ public final class Utils {
 		str = String.format("%8s", str).replaceAll(" ", "0");
 		return str;
 	}		
+	
+	public static String ind(int indent) {
+		StringBuilder str = new StringBuilder();
+		for (int i = 0; i < indent; i ++) {
+			str.append("  ");
+		}
+		return str.toString();
+	}
 }

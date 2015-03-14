@@ -1,5 +1,7 @@
 package com.tree;
 
+import com.Utils;
+
 public class BinarySearchTree<T extends Comparable<T>> {
 	
 	public TreeNode<T> root;
@@ -231,20 +233,13 @@ public class BinarySearchTree<T extends Comparable<T>> {
 	public void printHierarchy(TreeNode<T> n, int indent) {
 		System.out.println(n);
 		if (n.left != null) {
-			System.out.print(ind(indent + 1) + "left: ");
+			System.out.print(Utils.ind(indent + 1) + "left: ");
 			printHierarchy(n.left, indent + 1);
 		}
 		if (n.right != null) {
-			System.out.print(ind(indent + 1) + "right: ");
+			System.out.print(Utils.ind(indent + 1) + "right: ");
 			printHierarchy(n.right, indent + 1);
 		}
 	}
 
-	String ind(int indent) {
-		StringBuilder str = new StringBuilder();
-		for (int i = 0; i < indent; i ++) {
-			str.append("  ");
-		}
-		return str.toString();
-	}
 }

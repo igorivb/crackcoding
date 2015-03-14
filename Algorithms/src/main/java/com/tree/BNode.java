@@ -1,37 +1,67 @@
 package com.tree;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class BNode<T extends Comparable<T>> {
 
-	//TODO: handle that it can be null
+	//sorted
 	private List<T> keys;
 	
-	//TODO: handle that it can be null
+	//sorted according to keys
 	private List<BNode<T>> children;
 	
 	public boolean isLeaf = true;		
 		
-	public void addChild(int ind, BNode<T> child) {
-		//TODO: implement		
+	public BNode(int t) {
+		keys = new ArrayList<>(2 * t - 1);
+		children = new ArrayList<>(2 * t);
+	}
+	
+	public void addChild(int index, BNode<T> child) {
+		children.add(index, child);	
 	}	
 	
-	public void addKey(int ind, T key) {
-		//TODO: implement
+	public void addKey(int index, T key) {
+		this.keys.add(index, key);
 	}
 	
 	public int getKeysNumber() {
-		//TODO look in keys
-		return 0;
+		return this.keys.size();
 	}
 	
-	public List<T> getKeys() {
-		return this.keys;
+	public T getKey(int index) {
+		return this.keys.get(index);
 	}
 	
-	public List<BNode<T>> getChildren() {
-		return this.children;
+	public BNode<T> getChild(int index) {
+		return this.children.get(index);
 	}
+	
+	public void removeKey(int index) {
+		this.keys.remove(index);
+	}
+	
+	/**
+	 * Can be negative.
+	 */
+	public int getKeyIndex(T key) {
+		return Collections.binarySearch(this.keys, key);
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("Leaf: %b, keys number: %d, keys: %s", isLeaf, this.getKeysNumber(), this.keys);
+	}
+	
+//	public List<T> getKeys() {
+//		return this.keys;
+//	}
+//	
+//	public List<BNode<T>> getChildren() {
+//		return this.children;
+//	}
 	
 	
 }
