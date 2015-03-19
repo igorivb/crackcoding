@@ -10,7 +10,7 @@
 
 
 
- int main(void) {             /* Calling function */
+ int main_check(void) {             /* Calling function */
 
 	 double myfunction2(int);
 
