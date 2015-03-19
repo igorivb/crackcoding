@@ -24,12 +24,14 @@ public class B_Tree<T extends Comparable<T>> {
 	//write node to disk
 	private void diskWrite(BNode<T> n) { }
 	
-	//create page on disk
+	//create page on disk	
 	private BNode<T> allocateNode() {
 		BNode<T> node = new BNode<>(this.t);
 		node.isLeaf = true;
 		return node;
 	} 
+	
+	//TODO: do we need freeNode(node) ?
 	
 	public Tuple2<BNode<T>, Integer> search(BNode<T> n, T key) {
 		while (true) {
