@@ -22,7 +22,7 @@ public class QuickSort3 {
 		}
 	}
 	
-	static <T> int rotateElements(T[] mas, int s, int e, Comparator<T> cmp) {
+	static <T> int rotateElements(T[] mas, int s, int e, Comparator<T> cmp) {                      
 		int pi = getRandom(s, e);
 		System.out.println("random: " + pi);
 		T p = mas[pi];
