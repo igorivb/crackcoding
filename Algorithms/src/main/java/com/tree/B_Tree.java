@@ -18,7 +18,7 @@ public class B_Tree<T extends Comparable<T>> {
 	
 	//read node from disk
 	private BNode<T> diskRead(BNode<T> n, int childIndex) {		
-		return n.getChild(childIndex);
+		return n.getPrivateChild(childIndex);
 	}
 	
 	//write node to disk
@@ -33,6 +33,22 @@ public class B_Tree<T extends Comparable<T>> {
 	
 	//TODO: do we need freeNode(node) ?
 	
+	/**
+	 * Print keys in alphabetical order.
+	 */
+	public void traverseSorted(BNode<T> n) {
+		int i = 0;
+		for (; i < n.getKeysNumber(); i ++) {
+			if (!n.isLeaf) {
+				traverseSorted(this.diskRead(n, i));
+			}
+			System.out.print(n.getKey(i) + " ");
+		} 
+		if (!n.isLeaf) {
+			traverseSorted(diskRead(n, i));
+		}			
+	}
+			
 	public Tuple2<BNode<T>, Integer> search(BNode<T> n, T key) {
 		while (true) {
 			int i = n.getKeyIndex(key);
@@ -46,6 +62,28 @@ public class B_Tree<T extends Comparable<T>> {
 			}
 		}
 	}	
+	
+	public Tuple2<BNode<T>, Integer> search2(BNode<T> n, T key) {
+		int i;
+		for (i = 0; i < n.getKeysNumber() && key.compareTo(n.getKey(i)) > 0; i ++);		
+		if (i < n.getKeysNumber() && key.equals(n.getKey(i))) { //found
+			return new Tuple2<BNode<T>, Integer>(n, i);
+		} else if (!n.isLeaf) {
+			return search2(this.diskRead(n, i), key);
+		} else {
+			return null;
+		}
+	}
+	
+	public T min(BNode<T> n) {
+		for (; !n.isLeaf; n = this.diskRead(n, 0));
+		return n.getKey(0);
+	}
+	
+	public T max(BNode<T> n) {
+		for (;!n.isLeaf; n =  diskRead(n, n.getKeysNumber()));
+		return n.getKey(n.getKeysNumber() - 1);
+	}
 	
 	public void insert(T key) {
 		if (root == null) {
@@ -83,7 +121,7 @@ public class B_Tree<T extends Comparable<T>> {
 	}
 
 	private void splitNode(BNode<T> parent, int childIndex) {		
-		BNode<T> n = parent.getChild(childIndex);		
+		BNode<T> n = diskRead(parent, childIndex);		
 		int medianIndex = this.getMedianIndex();	
 		
 		BNode<T> newNode = this.allocateNode();
@@ -121,7 +159,7 @@ public class B_Tree<T extends Comparable<T>> {
 		System.out.println(Utils.ind(indent) + node);
 		if (!node.isLeaf) {
 			for (int i = 0; i < node.getKeysNumber() + 1; i ++) { 
-				print(node.getChild(i), indent + 1);
+				print(diskRead(node, i), indent + 1);
 			}	
 		}		
 	}
@@ -140,12 +178,15 @@ public class B_Tree<T extends Comparable<T>> {
 		
 		//search
 		for (int i : input) {
-			Tuple2<BNode<Integer>, Integer> res = tree.search(tree.root, i);
+			Tuple2<BNode<Integer>, Integer> res = tree.search2(tree.root, i);
 			System.out.printf("Search: %d, found: %s\n", i, 
 				(res != null ? (String.format("[%d, %s]", res._2, res._1)) : "<not found>"));
 		}
 		
+		tree.traverseSorted(tree.root);
 		
+		System.out.printf("%nMin: %s%n", tree.min(tree.root));
+		System.out.printf("Max: %s%n", tree.max(tree.root));
 	}
 	
 }

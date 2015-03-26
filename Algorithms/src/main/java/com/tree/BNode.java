@@ -35,7 +35,8 @@ public class BNode<T extends Comparable<T>> {
 		return this.keys.get(index);
 	}
 	
-	public BNode<T> getChild(int index) {
+	//can be called by B_Tree now
+	BNode<T> getPrivateChild(int index) {
 		return this.children.get(index);
 	}
 	
