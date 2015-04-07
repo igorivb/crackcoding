@@ -1,5 +1,7 @@
 package com.tree;
 
+import com.IntWrapper;
+
 
 /**
  * Implement a function to check if a binary tree is a binary search tree.
@@ -24,11 +26,7 @@ public class Task4_5 {
 		return true;
 	}
 	
-	 
-	
-	static class IntWrapper {
-		int val = 0;	
-	}
+
 			
 	public static boolean isBinarySearchTreeOnSorting1(IntNode n) {
 		int[] mas = new int[n.size()];
