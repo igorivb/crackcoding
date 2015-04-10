@@ -17,7 +17,7 @@ void putInputChar(char);
 void push(double);
 double pop(void);
 
-int main(int argc, char **argv) {
+int main_polish(int argc, char **argv) {
 	int type;
 	char s[MAXOP];
 	double op2;
