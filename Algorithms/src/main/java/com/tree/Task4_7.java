@@ -7,26 +7,6 @@ package com.tree;
  * necessarily a binary search tree
  */
 public class Task4_7 {
-
-	static class Node {
-		final String id;		
-		Node left, right;
-		public Node(String id) {
-			this.id = id;
-		}
-		public Node setLeft(Node n) {
-			this.left = n;
-			return this;
-		}
-		public Node setRight(Node n) {
-			this.right = n;
-			return this;
-		}	
-		@Override
-		public String toString() {		
-			return this.id;
-		}
-	} 
 	
 	static class SearchResult {
 		boolean n1, n2;
@@ -35,7 +15,7 @@ public class Task4_7 {
 	/**
 	 * Simple version. Has bug when nodes are nested.
 	 */
-	public Node findFirstCommonAncestor1(Node root, Node n1, Node n2) {
+	public StringNode findFirstCommonAncestor1(StringNode root, StringNode n1, StringNode n2) {
 		SearchResult res = new SearchResult();
 		
 		if (root == null) {
@@ -53,7 +33,7 @@ public class Task4_7 {
 		}
 	}
 	
-	void find(Node root, Node n1, Node n2, SearchResult res) {
+	void find(StringNode root, StringNode n1, StringNode n2, SearchResult res) {
 		if (root != null) {
 			if (root == n1) {
 				res.n1 = true;
@@ -75,19 +55,19 @@ public class Task4_7 {
 	 * Assumes that n1 and n2 are in tree. 
 	 * TODO: handle that nodes may be not present in tree.
 	 */
-	public Node findFirstCommonAncestor2(Node root, Node n1, Node n2) {
+	public StringNode findFirstCommonAncestor2(StringNode root, StringNode n1, StringNode n2) {
 		if (root == null) {
 			return null;
 		}
 			
-		Node currentRes = null;		
+		StringNode currentRes = null;		
 		if (root == n1) {
 			currentRes = n1;
 		} else if (root == n2) {
 			currentRes = n2;
 		}
 		
-		Node resLeft = findFirstCommonAncestor2(root.left, n1, n2);
+		StringNode resLeft = findFirstCommonAncestor2(root.left, n1, n2);
 		if (resLeft != null) {
 			if (currentRes != null) {
 				return null; //no result because nodes contain each other	
@@ -97,7 +77,7 @@ public class Task4_7 {
 			}			
 		}
 		
-		Node resRight = findFirstCommonAncestor2(root.right, n1, n2);
+		StringNode resRight = findFirstCommonAncestor2(root.right, n1, n2);
 		if (resRight != null) {
 			if (currentRes != null) {
 				return null; //no result because nodes contain each other	
@@ -120,7 +100,7 @@ public class Task4_7 {
 	/**
 	 * From crack coding book. 
 	 */
-	public Node commonAncestorBad(Node root, Node p, Node q) {
+	public StringNode commonAncestorBad(StringNode root, StringNode p, StringNode q) {
 		if (root == null) {
 			return null;
 		}
@@ -128,12 +108,12 @@ public class Task4_7 {
 			return root;
 		}
 
-		Node x = commonAncestorBad(root.left, p, q);
+		StringNode x = commonAncestorBad(root.left, p, q);
 		if (x != null && x != p && x != q) { // Already found ancestor
 			return x;
 		}
 
-		Node y = commonAncestorBad(root.right, p, q);
+		StringNode y = commonAncestorBad(root.right, p, q);
 		if (y != null && y != p && y != q) { // Already found ancestor
 			return y;
 		}
@@ -155,19 +135,19 @@ public class Task4_7 {
 	 * Assumes that n1 and n2 are in tree. 
 	 * Handle that nodes may be not present in tree.
 	 */
-	public Node findFirstCommonAncestor3(Node root, Node n1, Node n2) {
-		Node res = findFirstCommonAncestor3Internal(root, n1, n2);
+	public StringNode findFirstCommonAncestor3(StringNode root, StringNode n1, StringNode n2) {
+		StringNode res = findFirstCommonAncestor3Internal(root, n1, n2);
 		return res == n1 || res == n2 ? null : res;
 	}
-	private Node findFirstCommonAncestor3Internal(Node root, Node n1, Node n2) {
+	private StringNode findFirstCommonAncestor3Internal(StringNode root, StringNode n1, StringNode n2) {
 		if (root == null) {
 			return null;
 		}		
 		
-		Node currentRes = root == n1 ? n1 : (root == n2 ? n2 : null);
+		StringNode currentRes = root == n1 ? n1 : (root == n2 ? n2 : null);
 		
 		//search in left side
-		Node resLeft = findFirstCommonAncestor3Internal(root.left, n1, n2);
+		StringNode resLeft = findFirstCommonAncestor3Internal(root.left, n1, n2);
 		if (resLeft != null) {
 			if (currentRes != null) {
 				return null; //no result because nodes contain each other	
@@ -178,7 +158,7 @@ public class Task4_7 {
 		}
 		
 		//search in right side
-		Node resRight = findFirstCommonAncestor3Internal(root.right, n1, n2);
+		StringNode resRight = findFirstCommonAncestor3Internal(root.right, n1, n2);
 		if (resRight != null) {
 			if (currentRes != null) {
 				return null; //no result because nodes contain each other	
@@ -203,9 +183,9 @@ public class Task4_7 {
 	
 	
 	public static void main(String[] args) {
-		Node root = new Node("3");
-		Node n1 = new Node("5");
-		Node n2 = new Node("15");
+		StringNode root = new StringNode("3");
+		StringNode n1 = new StringNode("5");
+		StringNode n2 = new StringNode("15");
 		
 		//case-1: nodes are nested, no result
 //		root.setRight(n1.setLeft(n2));
@@ -232,7 +212,7 @@ public class Task4_7 {
 		
 				
 		Task4_7 task = new Task4_7();			
-		Node successor = task.findFirstCommonAncestor3(root, n1, n2);
+		StringNode successor = task.findFirstCommonAncestor3(root, n1, n2);
 		
 		
 		
