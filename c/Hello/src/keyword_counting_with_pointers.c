@@ -9,7 +9,7 @@ extern struct key keytab[];
 struct key* binarySearchP(char *, struct key*, int);
 
 
-int main(int argc, char **argv) {
+int main_keyword_counting_with_pointers(int argc, char **argv) {
 
 	char word[MAX_WORD];
 	struct key* ind;

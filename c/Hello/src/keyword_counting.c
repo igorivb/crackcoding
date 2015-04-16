@@ -62,7 +62,7 @@ int getWord(char* word, int len) {
 
 	if (wordCount < num) {
 
-		//TODO: does it copy correctly (issue could be because I don't use '\0')
+		//TODO: does it copy correctly? (issue could be because I don't use '\0')
 		strcpy(word, words[wordCount]);
 
 		return wordCount++;
