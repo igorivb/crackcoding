@@ -89,7 +89,7 @@ void printTree(struct tnode* node) {
 	}
 }
 
-int main(int argc, char **argv) {
+int main_keyword_counting_any_words(int argc, char **argv) {
 	char *word;
 	while ((word = getWord2()) != NULL) {
 		if (isalpha(word[0])) {
