@@ -1,23 +1,21 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "common.h"
 
 #define TABLE_SIZE 100
 
 struct tnode {
-	char *name;
-	char *dfn;
+	String name;
+	String dfn;
 	struct tnode *next;
 } *buckets[TABLE_SIZE];
 
 typedef struct tnode* pnode;
 
 
-char* dup(char* s) {
-	char *res;
-	if ((res = malloc(strlen(s) + 1)) == NULL) {
+String dup(String s) {
+	String res;
+	if ((res = malloc(strlen(s) + 1)) == null) {
 		fprintf(stderr, "Failed to duplicate string: %s\n", s);
-		return NULL;
+		return null;
 	}
 	strcpy(res, s);
 	return res;
@@ -25,13 +23,13 @@ char* dup(char* s) {
 
 pnode nodealloc() {
 	pnode res;
-	if ((res = (pnode) malloc(sizeof(struct tnode))) == NULL) {
+	if ((res = (pnode) malloc(sizeof(struct tnode))) == null) {
 		fprintf(stderr, "Failed to allocated node");
 	}
 	return res;
 }
 
-int hash(char *s) {
+int hash(String s) {
 	unsigned h = 0;
 	for (; *s != '\0'; s++) {
 		h = *s + 31 * h;
@@ -39,28 +37,28 @@ int hash(char *s) {
 	return h % TABLE_SIZE;
 }
 
-pnode lookup(char* name) {
+pnode lookup(String name) {
 	pnode n;
-	for (n = buckets[hash(name)]; n != NULL; n = n->next) {
+	for (n = buckets[hash(name)]; n != null; n = n->next) {
 		if (strcmp(n->name, name) == 0) {
 			return n;
 		}
 	}
-	return NULL;
+	return null;
 }
 
-pnode insert(char *name, char *dfn) {
+pnode insert(String name, String dfn) {
 	pnode n;
-	if ((n = lookup(name)) != NULL) {
+	if ((n = lookup(name)) != null) {
 		free(n->dfn);
-		if ((n->dfn = dup(dfn)) == NULL) {
-			return NULL;
+		if ((n->dfn = dup(dfn)) == null) {
+			return null;
 		}
 	} else {
-		if ((n = nodealloc()) == NULL ||
-			(n->name = dup(name)) == NULL ||
-			(n->dfn = dup(dfn)) == NULL) {
-			return NULL;
+		if ((n = nodealloc()) == null ||
+			(n->name = dup(name)) == null ||
+			(n->dfn = dup(dfn)) == null) {
+			return null;
 		}
 		int ind = hash(name);
 		n->next = buckets[ind];
@@ -75,8 +73,8 @@ int main(int argc, char **argv) {
 	insert("a", "aa");
 
 	pnode res;
-	printf("a = %s\n", (res = lookup("a")) != NULL ? res->dfn : "<null>");
-	printf("b = %s\n", (res = lookup("b")) != NULL ? res->dfn : "<null>");
+	printf("a = %s\n", (res = lookup("a")) != null ? res->dfn : "<null>");
+	printf("b = %s\n", (res = lookup("b")) != null ? res->dfn : "<null>");
 
 	return 0;
 }
