@@ -32,14 +32,14 @@ public class Task10_3 {
 		return -1; //not found
 	}
 	
-	public int findFreeNumSmallMemory(File file, final int blocksCount, final int blockSize) throws IOException {
+	private int findFreeBlock(File file, final int blocksCount, final int blockSize) throws IOException {
 		int[] blocks = new int[blocksCount];
 		
 		//read file and count elements in block
 		try (Scanner sc = new Scanner(new FileInputStream(file));) {
 			int num;
 			while (sc.hasNextInt() && (num = sc.nextInt()) >= 0) {
-				blocks[blockIndex(num, blocksCount)] ++;
+				blocks[blockIndex(num, blockSize)] ++;
 			}
 		}
 		
@@ -52,43 +52,54 @@ public class Task10_3 {
 			}
 		}
 		
-		if (freeBlock == -1) {
-			return freeBlock;// no result
-		}
+		return freeBlock;
+	}
+	
+	//blocksCount and blockSize should be power of 2
+	public int findFreeNumSmallMemory(File file, final int blocksCount, final int blockSize) throws IOException {
+		final int vector_item_size = 32; //because we use int 
 		
-		//find free num in block: read from file
-		final int int_size = 32; 
-		
-		int[] bitVector = new int[blockSize / int_size]; //TODO: can loose some memory		
-		try (Scanner sc = new Scanner(new FileInputStream(file));) {
-			int num;
-			while (sc.hasNextInt() && (num = sc.nextInt()) >= 0) {
-				if (blockIndex(num, blocksCount) == freeBlock) {											
-					bitVector[num % bitVector.length] |= 1 << (num % int_size);	
-				}				
+		int freeBlock;
+		if ((freeBlock = findFreeBlock(file, blocksCount, blockSize)) != -1) {						
+			
+			//find free num in block: read from file
+			int[] bitVector = new int[blockSize / vector_item_size]; 
+			try (Scanner sc = new Scanner(new FileInputStream(file));) {
+				int num;
+				while (sc.hasNextInt() && (num = sc.nextInt()) >= 0) {
+					if (blockIndex(num, blockSize) == freeBlock) {
+						num = num % blockSize;
+						bitVector[num / vector_item_size] |= 1 << (num % vector_item_size);	
+					}				
+				}
 			}
-		}
-		
-		//find free num in bitVector
-		for (int i = 0; i < bitVector.length; i ++) {
-			if (bitVector[i] != 0xFFFFFFFF) { //has free space
-				for (int j = 0; j < int_size; j ++) {
-					if ((bitVector[i] & (1 << j)) == 0) {
-						return freeBlock * blockSize + i * int_size + j;  
+			
+			//find free num in bitVector
+			for (int i = 0; i < bitVector.length; i ++) {
+				if (bitVector[i] != 0xFFFFFFFF) { //has free space
+					for (int j = 0; j < vector_item_size; j ++) {
+						if ((bitVector[i] & (1 << j)) == 0) {
+							return freeBlock * blockSize + i * vector_item_size + j;  
+						}
 					}
 				}
 			}
 		}
-		
-		return -1; //should never go here
+		return -1; // no result
 	}
 
 	private int blockIndex(int num, int size) {	
-		return num % size;
+		return num / size;
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		Task10_3 task = new Task10_3();
-		System.out.println(task.findFreeNumBigMemory());
+		//System.out.println(task.findFreeNumBigMemory());
+		
+		int blocksCount = 1 << 5;
+		int blockSize = 1 << 26;
+		System.out.println(task.findFreeNumSmallMemory(new File("src/main/resources/task10_3_input.txt"), blocksCount, blockSize));
 	}
+	
+	
 }
