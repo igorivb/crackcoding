@@ -2,6 +2,7 @@ package com.threads;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * In the famous dining philosophers problem, a bunch of philosophers are sitting
@@ -14,11 +15,18 @@ import java.util.concurrent.Executors;
 public class Task16_3 {
 
 	public static void main(String[] args) throws Exception {
-		final int size = 5;
+		final int size = 3;
 		
 		Sticks sticks = new Sticks(size);
 		
-		ExecutorService executorService = Executors.newFixedThreadPool(size);
+		ExecutorService executorService = Executors.newFixedThreadPool(size, new ThreadFactory() { //change thread name			
+			@Override
+			public Thread newThread(Runnable r) {
+				String name = "Philosopher";
+				Thread t = new Thread(r, name);				
+				return t;
+			}
+		});
 		for (int i = 0; i < size; i ++) {
 			executorService.submit(new Philosopher(i, sticks));	
 		}

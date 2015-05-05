@@ -1,16 +1,19 @@
 package com.threads;
 
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Philosopher implements Runnable {
 
 	public final int number;
-	final Sticks sticks;
+	private final Sticks sticks;
 	
-	Stick left, right;
-	boolean up;
+	private Stick left, right;
+	private boolean up;
 	
-	Random r = new Random(System.currentTimeMillis());
+	private Random r = new Random(System.currentTimeMillis());
+	
+	private static AtomicInteger opCounter = new AtomicInteger(0);
 	
 	public Philosopher(int number, Sticks sticks) {
 		this.number = number;
@@ -36,17 +39,17 @@ public class Philosopher implements Runnable {
 				}				
 			}	
 		} catch (InterruptedException ie) {
-			Thread.currentThread().interrupt(); //propogate exception to Thread
+			Thread.currentThread().interrupt(); //propagate exception to Thread
 		}			
 	}
 
-	private void releaseLeft() {
+	private void releaseLeft() throws InterruptedException {
 		sticks.releaseStick(left);
 		left = null;
 		print("Release left");
 	}
 	
-	private void releaseRight() {
+	private void releaseRight() throws InterruptedException {
 		sticks.releaseStick(right);
 		right = null;
 		up = false;
@@ -59,8 +62,9 @@ public class Philosopher implements Runnable {
 	}
 
 	private void takeLeft() throws InterruptedException {		
-		left = sticks.getStick(this, true);		
-		up = true;
+		if ((left = sticks.getStick(this, true)) != null) {
+			up = true;	
+		}
 		print("Take left: " + left);
 	}
 
@@ -71,7 +75,7 @@ public class Philosopher implements Runnable {
 	}
 	
 	private void print(String msg) {
-		System.out.println(toString() + ": " + msg);		
+		System.out.printf("%3d. %s: %s%n", opCounter.incrementAndGet(), this.toString(), msg);		
 	}
 
 	@Override
