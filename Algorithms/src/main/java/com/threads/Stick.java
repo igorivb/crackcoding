@@ -1,35 +1,22 @@
 package com.threads;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class Stick {
 
-	public final int num;
-	
-	private Philosopher owner;
-	
+	private final int num;
+	private Lock lock = new ReentrantLock();
+
 	public Stick(int num) {
 		this.num = num;
 	}
 	
-	public void setOwner(Philosopher owner) {
-		if (this.owner != null) {
-			throw new IllegalStateException("Failed to get stick: " + toString());
-		}
-		this.owner = owner;
+	public boolean pickup() {
+		return lock.tryLock();
 	}
 	
-	void intern_release() {
-		if (this.owner == null) {
-			throw new IllegalStateException("Failed to release stick: " + this.toString());
-		}
-		this.owner = null;
-	}
-
-	public boolean isFree() {
-		return this.owner == null;
-	}
-	
-	@Override
-	public String toString() {	
-		return "Stick_" + num + ", owner: " + owner;
+	public void putDown() {
+		lock.unlock();
 	}
 }

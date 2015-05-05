@@ -1,85 +1,90 @@
 package com.threads;
 
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Philosopher implements Runnable {
 
-	public final int number;
-	private final Sticks sticks;
+	private final int num;	
+	private final Stick left;
+	private final Stick right;
 	
-	private Stick left, right;
-	private boolean up;
-	
-	private Random r = new Random(System.currentTimeMillis());
+	private final int max;	
+	private int eatCount;
 	
 	private static AtomicInteger opCounter = new AtomicInteger(0);
+	private Random r = new Random(System.currentTimeMillis()); 
 	
-	public Philosopher(int number, Sticks sticks) {
-		this.number = number;
-		this.sticks = sticks;
+	CountDownLatch latch;
+	
+	public Philosopher(int num, Stick left, Stick right, int max, CountDownLatch latch) {
+		this.num = num;
+		this.left = left;
+		this.right = right;
+		
+		this.max = max;
+		this.latch = latch;
 	}
-	
+
 	@Override
 	public void run() {
 		try {
-			while (true) {						
-				think();
-				
-				if (left == null && right == null) {
-					takeLeft();
-				} else if (left != null && right == null) {
-					if (up) {
-						takeRight();	
-					} else {
-						releaseLeft();
-					}
-				} else {
-					releaseRight();
-				}				
-			}	
-		} catch (InterruptedException ie) {
-			Thread.currentThread().interrupt(); //propagate exception to Thread
-		}			
+			while(eatCount < max) {
+				eat();
+			}
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
 	}
 
-	private void releaseLeft() throws InterruptedException {
-		sticks.releaseStick(left);
-		left = null;
-		print("Release left");
+	private void eat() throws InterruptedException {
+		if (pickUp()) {
+			chew();
+			putDown();
+		}		
 	}
 	
-	private void releaseRight() throws InterruptedException {
-		sticks.releaseStick(right);
-		right = null;
-		up = false;
-		print("Release right");
-	}
-
-	private void takeRight() throws InterruptedException {		
-		right = sticks.getStick(this, false);		
-		print("Take right: " + right); 
-	}
-
-	private void takeLeft() throws InterruptedException {		
-		if ((left = sticks.getStick(this, true)) != null) {
-			up = true;	
+	private boolean pickUp() throws InterruptedException {
+		pause();
+		print("Left picking up");
+		if (left.pickup()) {
+			pause();
+			print("Right picking up");
+			if (right.pickup()) {
+				return true;
+			} else {
+				print("Left put down");
+				left.putDown();
+			}
 		}
-		print("Take left: " + left);
+		return false;
 	}
 
-	private void think() throws InterruptedException {
-		int sleep = r.nextInt(1000);
-		//print("Think for " + sleep + " milisecs");
-		Thread.sleep(sleep);				
+	private void chew() throws InterruptedException {
+		print("Eat " + eatCount ++);	
+		latch.countDown();
+		pause();		
+	}
+
+	private void putDown() {
+		print("Right put down");
+		right.putDown();
+		print("Left put down");
+		left.putDown();		
+	}
+
+	private void pause() throws InterruptedException {
+		int sec = r.nextInt(1000);
+		Thread.sleep(sec);
+	}
+	
+	@Override
+	public String toString() {
+		return "Phil_" + num;
 	}
 	
 	private void print(String msg) {
-		System.out.printf("%3d. %s: %s%n", opCounter.incrementAndGet(), this.toString(), msg);		
-	}
-
-	@Override
-	public String toString() {	
-		return "Phil_" + number;
+		System.out.printf("%3d. %s: %s%n", opCounter.incrementAndGet(), this.toString(), msg);
 	}
 }

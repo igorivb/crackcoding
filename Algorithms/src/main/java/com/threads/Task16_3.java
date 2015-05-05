@@ -1,37 +1,49 @@
 package com.threads;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
-/**
- * In the famous dining philosophers problem, a bunch of philosophers are sitting
- * around a circular table with one chopstick between each of them. A philosopher
- * needs both chopsticks to eat, and always picks up the left chopstick before the right
- * one. A deadlock could potentially occur if all the philosophers reached for the left
- * chopstick at the same time. Using threads and locks, implement a simulation of the
- * dining philosophers problem that prevents deadlocks
- */
 public class Task16_3 {
 
-	public static void main(String[] args) throws Exception {
-		final int size = 3;
+	static final int size = 5;
+	static final int max = 3;
+	
+	private static Stick getLeft(int i, Stick[] sticks) {		
+		return sticks[i];
+	}
+	
+	private static Stick getRight(int i, Stick[] sticks) {
+		int num = i == 0 ? sticks.length - 1 : i - 1;
+		return sticks[num];
+	}
+	
+	public static void main(String[] args) throws Exception {	
+		CountDownLatch latch = new CountDownLatch(size * max);
 		
-		Sticks sticks = new Sticks(size);
-		
-		ExecutorService executorService = Executors.newFixedThreadPool(size, new ThreadFactory() { //change thread name			
-			@Override
-			public Thread newThread(Runnable r) {
-				String name = "Philosopher";
-				Thread t = new Thread(r, name);				
-				return t;
-			}
-		});
+		Stick[] sticks = new Stick[size];
 		for (int i = 0; i < size; i ++) {
-			executorService.submit(new Philosopher(i, sticks));	
+			sticks[i] = new Stick(i);
 		}
 		
-		Thread.sleep(60 * 1000);
-		executorService.shutdownNow();
-	}
+		Philosopher ps[] = new Philosopher[size];
+		for (int i = 0; i < size; i ++) {
+			ps[i] = new Philosopher(i, getLeft(i, sticks), getRight(i, sticks), max, latch);
+		}
+		
+		ExecutorService executorService = Executors.newFixedThreadPool(size); 
+		for (int i = 0; i < size; i ++) {
+			executorService.submit(ps[i]);
+		}
+		
+		//wait some time
+		//Thread.sleep(60 * 1000);
+		if (!latch.await(60, TimeUnit.SECONDS)) {
+			System.out.println("Stop on time out");
+		}	
+		System.out.println("Terminating threads");
+		executorService.shutdownNow();	
+	}	
+	
 }

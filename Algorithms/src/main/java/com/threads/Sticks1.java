@@ -3,16 +3,16 @@ package com.threads;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Sticks {
+public class Sticks1 {
 
-	private Stick[] sticks;
+	private Stick1[] sticks;
 	
 	private Lock lock = new ReentrantLock();
 	
-	public Sticks(int size) {
-		sticks = new Stick[size];
+	public Sticks1(int size) {
+		sticks = new Stick1[size];
 		for (int i = 0; i < size; i ++) {
-			sticks[i] = new Stick(i);
+			sticks[i] = new Stick1(i);
 		}
 	}
 	
@@ -20,9 +20,9 @@ public class Sticks {
 	 * Implementation with deadlock. 
 	 * Blocks till it gets stick. 
 	 */
-	public Stick getStick_Deadlock(Philosopher p, boolean left) throws InterruptedException {
+	public Stick1 getStick_Deadlock(Philosopher1 p, boolean left) throws InterruptedException {
 		int stickNum = left ? p.number : (p.number == 0 ? sticks.length - 1 : p.number - 1);				
-		Stick stick = sticks[stickNum];
+		Stick1 stick = sticks[stickNum];
 		synchronized (stick) {
 			while (!stick.isFree()) {
 				stick.wait();							
@@ -32,7 +32,7 @@ public class Sticks {
 		}
 	}
 	
-	public void releaseStick_Deadlock(Stick stick) {
+	public void releaseStick_Deadlock(Stick1 stick) {
 		synchronized (stick) {
 			stick.intern_release();
 			stick.notifyAll();
@@ -42,7 +42,7 @@ public class Sticks {
 	/**
 	 * Return null if stick is not available.
 	 */
-	public Stick getStick(Philosopher p, boolean left) throws InterruptedException {
+	public Stick1 getStick(Philosopher1 p, boolean left) throws InterruptedException {
 		int stickNum = left ? p.number : (p.number == 0 ? sticks.length - 1 : p.number - 1);
 		int rightNum = stickNum == 0 ? sticks.length - 1 : stickNum - 1;
 		
@@ -60,7 +60,7 @@ public class Sticks {
 		}															
 	}
 	
-	public void releaseStick(Stick stick) throws InterruptedException {
+	public void releaseStick(Stick1 stick) throws InterruptedException {
 		lock.lockInterruptibly();
 		try {
 			stick.intern_release();
