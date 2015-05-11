@@ -71,7 +71,7 @@ public class FolderProcessor extends RecursiveTask<List<String>> {
 	         
 	         TimeUnit.SECONDS.sleep(1);	         
 		} while (!task.isDone());
-		
+		;
 		pool.shutdown();
 		
 		Date end = new Date();
