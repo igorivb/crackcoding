@@ -1,6 +1,5 @@
 package com.math;
 
-import static com.Utils.doubleEquals;
 import static com.Utils.doubleCompare;
 
 /**
@@ -9,89 +8,6 @@ import static com.Utils.doubleCompare;
  * to the x-axis.
  */
 public class Task7_5 {
-
-	//point
-	static class Point {		
-		final double x, y;
-		
-		public Point(double x, double y) {
-			this.x = x;
-			this.y = y;
-		}		
-		
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) {
-				return true;
-			}
-			if (obj instanceof Point) {
-				Point p = (Point) obj;
-				return doubleEquals(this.x, p.x) && doubleEquals(this.y, p.y);
-			}
-			return false;
-		}
-		
-		@Override
-		public String toString() {			
-			return String.format("(%.2f, %.2f)", x, y);
-		}
-	}
-	
-	//slop and y-intercept
-	static class SlopLine {
-		final double a; //slop
-		final double b; //intercept
-		
-		//store x value in slop field
-		final boolean isVertical;
-		
-		public SlopLine(double a, double b) {
-			this.a = a;
-			this.b = b;
-			isVertical = false;
-		}
-		
-		//vertical
-		public SlopLine(double xVal) {
-			a = xVal;
-			b = Double.NaN; //not defined
-			isVertical = true;
-		}
-
-		public static SlopLine create(Point m1, Point m2) {
-			if (doubleEquals(m1.x, m2.x)) { //vertical: special case
-				return new SlopLine(m1.x);
-			} else {
-				double a = (m2.y - m1.y) / (m2.x - m1.x);
-				double b = m1.y - a * m1.x;
-				return new SlopLine(a, b);
-			}
-		}	
-		
-		public boolean isHorizontal() {
-			return !isVertical && doubleEquals(a, 0d);
-		}
-		
-		@Override
-		public String toString() {
-			return String.format("Vertical: %b, horizontal: %b, a: %.2f, b: %.2f", isVertical, isHorizontal(), a, b);
-		}
-	}
-	
-	//2 points
-	static class Line {
-		final Point p1, p2;
-
-		public Line(Point p1, Point p2) {
-			this.p1 = p1;
-			this.p2 = p2;
-		}	
-		
-		@Override
-		public String toString() {		
-			return String.format("line[%s, %s]", p1, p2);
-		}
-	}
 	
 	enum EdgeType {
 		LEFT, RIGHT, TOP, BOTTOM
@@ -103,6 +19,12 @@ public class Task7_5 {
 		public Square(Point top, Point bottom) {		
 			this.top = top;
 			this.bottom = bottom;
+		}
+		
+		public Square(Point top, int size) {	
+			this.top = top;
+			this.bottom = new Point(top.x + size, top.y - size);
+			
 		}
 
 		public Point getMiddle() {			
@@ -174,9 +96,13 @@ public class Task7_5 {
 		
 //		Square s1 = new Square(new Point(2, 3),new Point(4, 1)); 
 //		Square s2 = new Square(new Point(5, 6),new Point(7, 4));
+//		
+//		Square s1 = new Square(new Point(2, 3),new Point(4, 1)); 
+//		Square s2 = new Square(new Point(3, -2),new Point(5, -4));
 		
-		Square s1 = new Square(new Point(2, 3),new Point(4, 1)); 
-		Square s2 = new Square(new Point(3, -2),new Point(5, -4));
+
+		Square s1 = new Square(new Point(1, 1), 5);
+		Square s2 = new Square(new Point(2, 2), 3);
 		
 		Line res = findMiddleLine(s1, s2);
 		System.out.println("Middle line: " + res);				
