@@ -62,4 +62,21 @@ public final class Utils {
 		}
 		return str.toString();
 	}
+	
+	
+	final static double doubleEpsilon = 1e-5;
+	
+	/**
+	 * Note: it doesn't take into account special floating values, e.g. NaN, infinities
+	 */
+	public static boolean doubleEquals(double d1, double d2) {
+		return doubleCompare(d1, d2) == 0;
+	}
+
+	/**
+	 * Note: it doesn't take into account special floating values, e.g. NaN, infinities
+	 */
+	public static int doubleCompare(double d1, double d2) {
+		return Math.abs(d1 - d2) < doubleEpsilon ? 0 : (d1 < d2) ? -1 : 1;
+	}
 }
