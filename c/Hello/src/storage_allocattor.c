@@ -20,7 +20,7 @@ static Header base; /* empty list to get started */
 static Header *freep = NULL; /* start of free list */
 
 /* free: put block ap in free list */
-void free(void *ap) {
+void my_free(void *ap) {
 	Header *blockPtr, *ptr;
 	blockPtr = (Header *) ap - 1; /* point to block header */
 	for (ptr = freep; !(blockPtr > ptr && blockPtr < ptr->s.ptr); ptr = ptr->s.ptr)
@@ -50,7 +50,7 @@ static Header *morecore(unsigned nu) {
 		return NULL;
 	up = (Header *) cp;
 	up->s.size = nu;
-	free((void *) (up + 1));
+	my_free((void *) (up + 1));
 	return freep;
 }
 

@@ -2,7 +2,7 @@
 #include <ctype.h>
 
 //TODO: how to handle error ?
-int atoi(char str[]);
+static int atoi(char str[]);
 
 int main_atoi(int argc, char **argv) {
 
@@ -12,12 +12,12 @@ int main_atoi(int argc, char **argv) {
 	return 0;
 }
 
-int skipWhiteSpaces(char c[], int i) {
+static int skipWhiteSpaces(char c[], int i) {
 	for (; isspace(c[i]); i ++);
 	return i;
 }
 
-int atoi(char c[]) {
+static int atoi(char c[]) {
 	int i = 0;
 	int sign = 1;
 	int res = 0;

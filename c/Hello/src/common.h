@@ -15,9 +15,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 //allows to use String instead of char*
 typedef char* String;
+
+void errExit(char* msg);
+
+void errExitN(int error, char* msg);
 
 
 #endif /* COMMON_H_ */

@@ -3,16 +3,15 @@
 #define TABLE_SIZE 100
 
 struct tnode {
-	String name;
-	String dfn;
+	char* name;
+	char* dfn;
 	struct tnode *next;
 } *buckets[TABLE_SIZE];
 
 typedef struct tnode* pnode;
 
-
-String dup(String s) {
-	String res;
+char* dup_my(char* s) {
+	char* res;
 	if ((res = malloc(strlen(s) + 1)) == null) {
 		fprintf(stderr, "Failed to duplicate string: %s\n", s);
 		return null;
@@ -21,7 +20,7 @@ String dup(String s) {
 	return res;
 }
 
-pnode nodealloc() {
+static pnode nodealloc() {
 	pnode res;
 	if ((res = (pnode) malloc(sizeof(struct tnode))) == null) {
 		fprintf(stderr, "Failed to allocated node");
@@ -29,7 +28,7 @@ pnode nodealloc() {
 	return res;
 }
 
-int hash(String s) {
+int hash(char* s) {
 	unsigned h = 0;
 	for (; *s != '\0'; s++) {
 		h = *s + 31 * h;
@@ -37,7 +36,7 @@ int hash(String s) {
 	return h % TABLE_SIZE;
 }
 
-pnode lookup(String name) {
+pnode lookup(char* name) {
 	pnode n;
 	for (n = buckets[hash(name)]; n != null; n = n->next) {
 		if (strcmp(n->name, name) == 0) {
@@ -47,17 +46,17 @@ pnode lookup(String name) {
 	return null;
 }
 
-pnode insert(String name, String dfn) {
+pnode insert(char* name, char* dfn) {
 	pnode n;
 	if ((n = lookup(name)) != null) {
 		free(n->dfn);
-		if ((n->dfn = dup(dfn)) == null) {
+		if ((n->dfn = dup_my(dfn)) == null) {
 			return null;
 		}
 	} else {
 		if ((n = nodealloc()) == null ||
-			(n->name = dup(name)) == null ||
-			(n->dfn = dup(dfn)) == null) {
+			(n->name = dup_my(name)) == null ||
+			(n->dfn = dup_my(dfn)) == null) {
 			return null;
 		}
 		int ind = hash(name);
