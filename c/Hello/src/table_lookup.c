@@ -67,7 +67,7 @@ pnode insert(String name, String dfn) {
 	return n;
 }
 
-int main(int argc, char **argv) {
+int main_table_lookup(int argc, char **argv) {
 	insert("a", "a");
 	insert("b", "b");
 	insert("a", "aa");
