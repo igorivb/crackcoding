@@ -1,5 +1,7 @@
 package com;
 
+import java.util.Comparator;
+
 
 public final class Utils {
 
@@ -63,6 +65,15 @@ public final class Utils {
 		return str.toString();
 	}
 	
+	
+	public static <T> boolean isSortedArray(T[] mas, Comparator<T> cmp) {		
+		for (int i = 0; i < mas.length - 2; i ++) {
+			if (cmp.compare(mas[i], mas[i + 1]) > 0) {
+				return false;
+			}
+		}		
+		return true;
+	}
 	
 	final static double doubleEpsilon = 1e-5;
 	
