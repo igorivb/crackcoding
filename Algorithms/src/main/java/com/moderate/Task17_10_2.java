@@ -2,11 +2,34 @@ package com.moderate;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 import com.moderate.Task17_10.MyAttr;
 import com.moderate.Task17_10.MyElement;
-
+/**
+ * Grammar:
+ * 
+element:
+	'<'name (elContent | elEmpty) '>'
+elContent:
+	attribute* '>' (value | children)? </name>
+attribute:
+	name'='value
+children:
+	element+
+elEmpty:
+	'/'
+name:
+	chars
+value:
+	chars
+chars:
+	([letters] [digits] '_')+
+WHITESPACE: 
+	(' ' | '\t')+
+	
+Special: '<', '>', '/', '=', WHITESPACE
+ *
+ */
 public class Task17_10_2 {
 
 	public final static String OPEN_BRACKET = "<"; 
@@ -31,19 +54,10 @@ public class Task17_10_2 {
 	
 	public interface MyStream {
 		String next();
-		String peek(); //don't remove read element from stream	
+		String peek(); //don't remove read element from stream
+		String peek(int lookAhead);	
 		int getPos(); //for error handling
-		void put(String token, int pos);
-	}
-	
-	
-	private static class TokenInfo {
-		final String token;
-		final int pos;
-		public TokenInfo(String token, int pos) {		
-			this.token = token;
-			this.pos = pos;
-		}				
+		String value();	//get element value
 	}
 	
 	public static class MyStringTokenizer implements MyStream {
@@ -51,21 +65,23 @@ public class Task17_10_2 {
 		int pos = 0;
 		int prevPos = 0; //changed on next and peek 
 		
-		//use buffer if it is not empty instead of stream
-		Stack<TokenInfo> buffer = new Stack<>();
-		
 		public MyStringTokenizer(String str) {
 			this.str = str;
-		} 
+		} 				
 		
 		@Override
 		public String next() {
-			return doNext(true);
+			return doNext(true, 1);
 		}
 		
 		@Override
 		public String peek() {	
-			return doNext(false);
+			return doNext(false, 1);
+		}
+		
+		@Override
+		public String peek(int lookAhead) {	
+			return doNext(false, lookAhead);
 		}
 		
 		@Override
@@ -73,43 +89,55 @@ public class Task17_10_2 {
 			return this.prevPos;
 		}
 		
-		@Override
-		public void put(String token, int pos) {
-			buffer.push(new TokenInfo(token, pos));			
-		}	
-		
-		private String doNext(boolean remove) {			
-			if (!buffer.isEmpty()) {
-				TokenInfo res = remove ? buffer.pop() : buffer.peek();				
-				prevPos = res.pos;
-				return res.token;
+		private String doNext(boolean remove, int lookAhead) {			
+			prevPos = pos;
+			
+			String res = null;
+			for (int i = 0; i < lookAhead; i ++) {
+				if (pos == str.length()) {
+					throw new IllegalStateException("End of stream");
+				}
+				
+				StringBuilder tmp = new StringBuilder();			
+				String c = read();
+				if (isSpecial(c)) {
+					tmp.append(c);
+					pos ++;
+				} else {
+					while (pos < str.length() && !isSpecial(c = read())) {				
+						tmp.append(c);
+						pos ++;
+					}
+				}
+											
+				for (; pos < str.length() && isSpace(c = read()); pos ++); //skip spaces if any
+				
+				res = tmp.toString();
+			}
+											
+			if (!remove) {
+				pos = prevPos;
 			}
 			
+			return res;
+		}
+		
+		@Override
+		public String value() {						
 			if (pos == str.length()) {
 				throw new IllegalStateException("End of stream");
 			}
 			
 			prevPos = pos;
 			
-			StringBuilder res = new StringBuilder();			
-			String c = read();
-			if (isSpecial(c)) {
-				res.append(c);
-				pos ++;
-			} else {
-				while (pos < str.length() && !isSpecial(c = read())) {				
-					res.append(c);
-					pos ++;
-				}
-			}
-										
-			for (; pos < str.length() && isSpace(c = read()); pos ++); //skip spaces if any			
-			
-			if (!remove) {
-				pos = prevPos;
+			//read till we encounter open bracket
+			StringBuilder tmp = new StringBuilder();
+			String s;
+			for (; pos < str.length() && !OPEN_BRACKET.equals((s = read())); pos ++) {
+				tmp.append(s);
 			}
 			
-			return res.toString();
+			return tmp.toString();
 		}
 		
 		private String read() {
@@ -137,28 +165,21 @@ public class Task17_10_2 {
 	
 	public static class MyParser {
 		
-		public MyElement element(MyStream stream) {
-			String c = stream.next();
-			if (!c.equals(OPEN_BRACKET)) {
-				error("Expected: " + OPEN_BRACKET, c, stream);
-			}
+		public MyElement element(MyStream stream) {		
+			nextExpected(stream, OPEN_BRACKET);			
 			
 			String name = name(stream);
 			MyElement elem = new MyElement(name);
 			
 			if (SLASH.equals(stream.peek())) { //empty tag without body
-				stream.next();
-				if (!CLOSE_BRACKET.equals((c = stream.next()))) {
-					error("Expected: " + CLOSE_BRACKET, c, stream);
-				}	
+				stream.next();				
+				nextExpected(stream, CLOSE_BRACKET);			
 			} else {
 				elem.attributes = attributes(stream);
 				
-				if (!CLOSE_BRACKET.equals(c = stream.next())) {
-					error("Expected: " + CLOSE_BRACKET, c, stream);
-				}
-															
-				if (isValue(c = stream.peek())) { //value
+				nextExpected(stream, CLOSE_BRACKET);				
+																		
+				if (!OPEN_BRACKET.equals(stream.peek())) { //value
 					elem.value = value(stream);
 				} else if (isNewTag(stream)) { //children
 					elem.children = children(stream);
@@ -170,31 +191,20 @@ public class Task17_10_2 {
 			return elem;
 		}				
 
-		private void closeTag(String name, MyStream stream) {
-			String c;
-			if (!OPEN_BRACKET.equals((c = stream.next()))) {
-				error("Expected: " + OPEN_BRACKET, c, stream);										
-			}
-			if (!SLASH.equals((c = stream.next()))) {
-				error("Expected: " + SLASH, c, stream);										
-			}
+		private void closeTag(String name, MyStream stream) {			
+			nextExpected(stream, OPEN_BRACKET);
+			nextExpected(stream, SLASH);						
 															
 			String closedName = name(stream);
 			if (!closedName.equals(name)) {
 				error(String.format("Open: '%s' and close: '%s' names don't match", name, closedName), closedName, stream);
 			}
 			
-			if (!CLOSE_BRACKET.equals((c = stream.next()))) {
-				error("Expected: " + CLOSE_BRACKET, c, stream);
-			}			
+			nextExpected(stream, CLOSE_BRACKET);						
 		}
 
-		boolean isNewTag(MyStream stream) {
-			String c = stream.next();
-			int pos = stream.getPos();
-			boolean newTag = OPEN_BRACKET.equals(c) && isName(stream.peek());
-			stream.put(c, pos);
-			return newTag;
+		boolean isNewTag(MyStream stream) {			
+			return OPEN_BRACKET.equals(stream.peek(1)) && isName(stream.peek(2));			
 		}
 		
 		private List<MyElement> children(MyStream stream) {
@@ -208,15 +218,12 @@ public class Task17_10_2 {
 		List<MyAttr> attributes(MyStream stream) {
 			List<MyAttr> attrs = new ArrayList<>();
 			
-			String c;
-			while (isName((c = stream.peek()))) {
+			while (isName(stream.peek())) {
 				String name = name(stream);
 				
-				if (!EQUAL_SIGN.equals((c = stream.next()))) {
-					error("Expected: " + EQUAL_SIGN, c, stream);
-				}
+				nextExpected(stream, EQUAL_SIGN);				
 				
-				String value = value(stream);
+				String value = attrValue(stream);
 				
 				MyAttr attr = new MyAttr(name, value);
 				attrs.add(attr);
@@ -230,21 +237,19 @@ public class Task17_10_2 {
 		}
 		
 		String value(MyStream stream) {
-			return chars(stream);		
+			return stream.value();		
 		}
 		
+		String attrValue(MyStream stream) {
+			return chars(stream);		
+		}
+				
 		boolean isName(String str) {
 			return isChars(str);
 		}
 		
-		//TODO value may contain spaces: need to preserve original formatting
-		boolean isValue(String str) {
-			return isChars(str);
-		}
-		
 		//letters, digits, underscore
-		boolean isChars(String str) {
-			//should be alphabetic
+		boolean isChars(String str) {			
 			for (int i = 0; i < str.length(); i ++) {
 				char c = str.charAt(i);
 				if (!Character.isAlphabetic(c) && !Character.isDigit(c) && c != '_') {
@@ -265,6 +270,13 @@ public class Task17_10_2 {
 		private void error(String msg, String token, MyStream stream) {
 			throw new ParseException(
 				String.format("%s, token: '%s', pos: %d", msg, token, stream.getPos()), token, stream.getPos());			
+		}
+		
+		void nextExpected(MyStream stream, String expected) {
+			String c = stream.next();
+			if (!c.equals(expected)) {
+				error(String.format("Expected: '%s'", expected), c, stream);
+			}
 		}
 	}
 }

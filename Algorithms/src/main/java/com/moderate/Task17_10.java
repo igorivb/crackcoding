@@ -110,29 +110,13 @@ public class Task17_10 {
 	}
 	
 	public static void main(String[] args) {
-//		String[] words = { "family", "person", "firstName", "lastName", "state" };
-//		Map<String, Integer> mappings = new HashMap<>();
-//		for (int i = 0; i < words.length; i ++) {
-//			mappings.put(words[i], i + 1);
-//		}
-		
-//		MyElement root = new MyElement("family");
-//		root.attributes.add(new Attr("lastName", "McDowell"));
-//		root.attributes.add(new Attr("state", "CA"));
-//		
-//		MyElement person = new MyElement("person");
-//		root.children.add(person);
-//		person.attributes.add(new Attr("firstName", "Gayle"));
-//		person.value = "Some Message";
-		
-		
 		String[] inputs = {
-//			"<family/>", 
-//			"<a>aaa</a>",
-//			"<a f=ff	d=dd>aaa</a>",
-//			"<c></c>",
-//			"<a f=f1 dd=dd><c_c>some</c_c></a>",
-			"<note><to>Tove</to><from>Jani</from><heading>Reminder</heading><body>Dont forget me this weekend</body></note>"
+			"<family/>", 
+			"<a>aaa</a>",
+			"<a f=ff	d=dd>aaa</a>",
+			"<c></c>",
+			"<a f=f1 	   	dd=dd><c_c>some</c_c></a>",
+			"<note><to>Tove</to><from>Jani</from><heading>Reminder</heading><body>Don't forget me this weekend!</body></note>"
 		};
 		
 		for (String input : inputs) {			
