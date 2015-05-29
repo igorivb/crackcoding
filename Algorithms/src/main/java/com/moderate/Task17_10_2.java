@@ -3,17 +3,17 @@ package com.moderate;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.moderate.Task17_10.MyAttr;
-import com.moderate.Task17_10.MyElement;
+import com.moderate.ParserTask17_10.MyAttr;
+import com.moderate.ParserTask17_10.MyElement;
 /**
  * Grammar:
  * 
 element:
 	'<'name (elContent | elEmpty) '>'
 elContent:
-	attribute* '>' (value | children)? </name>
-attribute:
-	name'='value
+	attributes? '>' (value | children)? '<' '/' name '>'
+attributes:
+	(name'='attrValue)+
 children:
 	element+
 elEmpty:
@@ -21,6 +21,8 @@ elEmpty:
 name:
 	chars
 value:
+	everything except of '<'
+attrValue:
 	chars
 chars:
 	([letters] [digits] '_')+
@@ -36,8 +38,8 @@ public class Task17_10_2 {
 	public final static String CLOSE_BRACKET = ">";
 	public final static String EQUAL_SIGN = "=";
 	public final static String SLASH = "/";	
-	private final static String[] SPACES = {" ", "\t" };			
-	private final static String[] SPECIAL = { OPEN_BRACKET, CLOSE_BRACKET, SLASH, EQUAL_SIGN };
+	public final static String[] SPACES = {" ", "\t" };			
+	public final static String[] SPECIAL = { OPEN_BRACKET, CLOSE_BRACKET, SLASH, EQUAL_SIGN };
 	
 	public static class ParseException extends RuntimeException {
 		private static final long serialVersionUID = 1L;

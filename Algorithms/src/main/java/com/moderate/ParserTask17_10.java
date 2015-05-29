@@ -7,15 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import com.moderate.Task17_10_2.MyParser;
-import com.moderate.Task17_10_2.MyStream;
-import com.moderate.Task17_10_2.MyStringTokenizer;
-
 /**
  * Since XML is very verbose, you are given a way of encoding it where each tag gets
  * mapped to a pre-defined integer value
  */
-public class Task17_10 {
+public class ParserTask17_10 {
 
 	static class MyElement {
 		String name;
@@ -109,21 +105,17 @@ public class Task17_10 {
 		}		
 	}
 	
-	public static void main(String[] args) {
-		String[] inputs = {
-			"<family/>", 
-			"<a>aaa</a>",
-			"<a f=ff	d=dd>aaa</a>",
-			"<c></c>",
-			"<a f=f1 	   	dd=dd><c_c>some</c_c></a>",
-			"<note><to>Tove</to><from>Jani</from><heading>Reminder</heading><body>Don't forget me this weekend!</body></note>"
-		};
-		
+	static void test(String[] inputs) {
 		for (String input : inputs) {			
 			System.out.println("----- Input: " + input);
 			
-			MyStream stream = new MyStringTokenizer(input);
-			MyElement root = new MyParser().element(stream); //parse		
+			//version 1 of parser
+			//MyStream stream = new MyStringTokenizer(input);			
+			//MyElement root = new MyParser().element(stream);
+			
+			//version 2 of parser
+			Task17_10_3 parser = new Task17_10_3(input);
+			MyElement root = parser.element();
 			
 			System.out.println("\nParsed element:\n" + root);
 			
@@ -161,6 +153,19 @@ public class Task17_10 {
 			
 			System.out.println();
 		}				
+	}
+	
+	public static void main(String[] args) {
+		String[] inputs = {
+			"<family/>", 
+			"<a>aaa</a>",
+			"<a f=ff	d=dd>aaa</a>",
+			"<c></c>",
+			"<a f=f1 	   	dd=dd><c_c>some</c_c></a>",
+			"<note><to>Tove</to><from>Jani</from><heading>Reminder</heading><body>Don't forget me this weekend!</body></note>"
+		};
+		
+		test(inputs);				
 	}
 
 }
