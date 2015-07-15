@@ -182,7 +182,7 @@ public class Task17_10_3 {
 	void nextExpected(String expected) {
 		String c = next();
 		if (!c.equals(expected)) {
-			error(String.format("Expected: '%s', was: '%s'", expected, c), expected);
+			error(String.format("Expected: '%s', was: '%s'", expected), expected);
 		}
 	}
 

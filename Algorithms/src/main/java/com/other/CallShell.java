@@ -14,6 +14,11 @@ public class CallShell {
 		cmdarray[1] = "a=b";
 	    //params[1] = "C:\\Users\\user\\Desktop\\images.jpg";
 	    //params[2] = "C:\\Users\\user\\Desktop\\images2.txt";
+		
+		File f = new File(cmdarray[0]);
+		if (f.setExecutable(true)) {
+			System.out.println("Wan't able to make file executable");
+		}
 	    
 	    
 	    String[] envp = null;
